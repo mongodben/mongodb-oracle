@@ -1,0 +1,4 @@
+gpt-index
+html2text
+python-dotenv
+xmltodict
