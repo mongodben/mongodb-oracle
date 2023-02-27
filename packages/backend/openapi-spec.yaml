@@ -1,0 +1,80 @@
+# Generated this with ChatGPT. Seems generally correct to me but YMMV - Ben
+openapi: 3.0.0
+info:
+  title: MongoDB Oracle API
+  description: An API for the MongoDB Oracle. An AI-powered API to query data and return results in natural language.
+  version: 1.0.0
+
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - apiKey: []
+
+servers:
+  - url: https://<TBD>/api/v1
+
+paths:
+  /indexSite:
+    post:
+      operationId: indexSite
+      summary: |
+        Index a sitemap in the database.
+
+        If data already exists for the the website URL in the database, this operation
+        replaces all data for that sitemap.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sitemapUrl:
+                  type: string
+                  format: uri
+                  description: URL of the XML sitemap to be indexed
+                  example: https://www.mongodb.com/docs/atlas/sitemap.xml
+              required:
+                - sitemapUrl
+      responses:
+        '200':
+          description: Successfully indexed the sitemap
+        '400':
+          description: Invalid request body
+        '500':
+          description: Internal server error
+
+  /search:
+    get:
+      operationId: search
+      summary: Search for information in the indexed site
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+            description: Search query string
+          required: true
+          example: 'OpenAI'
+      responses:
+        '200':
+          description: Successfully retrieved information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                    format: markdown
+                    description: Response to the search query
+                    example: "## Results\n\nThe following pages match your query:\n\n- [Page 1](https://example.com/page1)\n  - **Matching content:** Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n- [Page 2](https://example.com/page2)\n  - **Matching content:** Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium."
+        '400':
+          description: Invalid query parameter
+        '500':
+          description: Internal server error
