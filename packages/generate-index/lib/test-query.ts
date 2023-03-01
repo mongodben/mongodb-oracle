@@ -88,7 +88,6 @@ async function runQuery() {
 
     Answer as markdown including related code snippets if available and relevant.
   `;
-
   const completionResponse = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt,
