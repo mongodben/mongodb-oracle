@@ -10,14 +10,8 @@ dotenv.config();
 const MAX_TOKENS = 1500;
 const { OPENAI_API_KEY, OPENAI_EMBEDDING_QUERY_MODEL } = process.env;
 
-async function runQuery() {
-  const userPrompt = createPrompt();
-  const query = userPrompt(
-    'What do you want to learn about Atlas App Services? '
-  );
-  // OpenAI recommends replacing newlines with spaces for best results
+async function runQuery(query: string) {
   const input = query.replace(/\n/g, ' ');
-
   const openai = new OpenAIApi(new Configuration({ apiKey: OPENAI_API_KEY }));
 
   // Generate a one-time embedding for the query itself
@@ -87,6 +81,7 @@ async function runQuery() {
     """
 
     Answer as markdown including related code snippets if available and relevant.
+    Format the code examples using proper line spacing and indentation.
   `;
   const completionResponse = await openai.createCompletion({
     model: 'text-davinci-003',
@@ -98,9 +93,32 @@ async function runQuery() {
     choices: [{ text }],
   } = completionResponse.data;
 
-  console.log(stripIndent`The answer to your question is:
+  console.log(
+    stripIndent`The answer to your question is:
 
-  ${text}`);
+  ${text}` + '\n\n'
+  );
 }
 
-runQuery();
+async function run() {
+  let continueSession = true;
+  while (continueSession === true) {
+    const userPrompt = createPrompt();
+    const query = userPrompt(
+      'What do you want to learn about Atlas App Services: '
+    );
+    // OpenAI recommends replacing newlines with spaces for best results
+
+    await runQuery(query);
+    const toContinue = userPrompt(
+      'Do you want to ask more questions? (*/n): '
+    ).trim();
+    if (toContinue === 'n') {
+      continueSession = false;
+    } else {
+      console.log('\n');
+    }
+  }
+  process.exit(0);
+}
+run();
