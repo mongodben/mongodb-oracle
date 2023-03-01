@@ -8,12 +8,12 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const MAX_TOKENS = 1500;
-const { OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL } = process.env;
+const { OPENAI_API_KEY, OPENAI_EMBEDDING_QUERY_MODEL } = process.env;
 
 async function runQuery() {
   const userPrompt = createPrompt();
   const query = userPrompt(
-    'What do you want to learn about Atlas App Services?'
+    'What do you want to learn about Atlas App Services? '
   );
   // OpenAI recommends replacing newlines with spaces for best results
   const input = query.replace(/\n/g, ' ');
@@ -22,7 +22,7 @@ async function runQuery() {
 
   // Generate a one-time embedding for the query itself
   const embeddingResponse = await openai.createEmbedding({
-    model: OPENAI_EMBEDDING_MODEL as string,
+    model: OPENAI_EMBEDDING_QUERY_MODEL as string,
     input,
   });
   const [{ embedding }] = embeddingResponse.data.data;
@@ -33,12 +33,12 @@ async function runQuery() {
   // smaller sections at earlier pre-processing/embedding step.
   // TODO: replace w mongodb stuff. right now just janky stubbed out
   const documents = await mongodbClient
-    .db('docs')
-    .collection('app-services')
-    .aggregate<IndexedDocument>([
+    .db('sites')
+    .collection('atlas-app-services')
+    .aggregate([
       {
         $search: {
-          // index: "<index name>", // optional, defaults to "default"
+          index: 'knn',
           knnBeta: {
             vector: embedding,
             path: 'embedding',
@@ -86,8 +86,7 @@ async function runQuery() {
     ${query}
     """
 
-    Answer as markdown including related code snippets if available.
-    Include the source links for relevant content formatted as Markdown footnotes:
+    Answer as markdown including related code snippets if available and relevant.
   `;
 
   const completionResponse = await openai.createCompletion({

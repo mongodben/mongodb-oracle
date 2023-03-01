@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-query": "ts-node lib/test-query.ts",
     "start": "ts-node lib/gen-index.ts",
-    "add-data": "ts-node lib/add-data-to-atlas.ts",
-    "langchain-gen": "NODE_OPTIONS='--experimental-fetch' ts-node lib/gen-index"
+    "add-data": "ts-node lib/add-data-to-atlas.ts"
   },
   "keywords": [],
   "author": "",
