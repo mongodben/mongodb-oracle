@@ -1,10 +1,10 @@
-import GPT3Tokenizer from "gpt3-tokenizer";
-import { Configuration, OpenAIApi } from "openai";
-import { stripIndent, oneLine } from "common-tags";
-import createPrompt from "prompt-sync";
-import { mongodbClient } from "./mongodb";
-import { IndexedDocument } from "./types"; // TODO: make this automatic
-import * as dotenv from "dotenv";
+import GPT3Tokenizer from 'gpt3-tokenizer';
+import { Configuration, OpenAIApi } from 'openai';
+import { stripIndent, oneLine } from 'common-tags';
+import createPrompt from 'prompt-sync';
+import { mongodbClient } from './mongodb';
+import { IndexedDocument } from './types'; // TODO: make this automatic
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 const MAX_TOKENS = 1500;
@@ -13,10 +13,10 @@ const { OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL } = process.env;
 async function runQuery() {
   const userPrompt = createPrompt();
   const query = userPrompt(
-    "What do you want to learn about Atlas App Services?"
+    'What do you want to learn about Atlas App Services?'
   );
   // OpenAI recommends replacing newlines with spaces for best results
-  const input = query.replace(/\n/g, " ");
+  const input = query.replace(/\n/g, ' ');
 
   const openai = new OpenAIApi(new Configuration({ apiKey: OPENAI_API_KEY }));
 
@@ -33,15 +33,15 @@ async function runQuery() {
   // smaller sections at earlier pre-processing/embedding step.
   // TODO: replace w mongodb stuff. right now just janky stubbed out
   const documents = await mongodbClient
-    .db("docs")
-    .collection("app-services")
+    .db('docs')
+    .collection('app-services')
     .aggregate<IndexedDocument>([
       {
         $search: {
           // index: "<index name>", // optional, defaults to "default"
           knnBeta: {
             vector: embedding,
-            path: "embedding",
+            path: 'embedding',
             // "filter": {<filter-specification>},
             k: 10,
             // "score": {<options>} NOTE: not sure what this is
@@ -51,9 +51,9 @@ async function runQuery() {
     ])
     .toArray();
 
-  const tokenizer = new GPT3Tokenizer({ type: "gpt3" });
+  const tokenizer = new GPT3Tokenizer({ type: 'gpt3' });
   let tokenCount = 0;
-  let contextText = "";
+  let contextText = '';
 
   // TODO: see if can do something cute to include links in here
   // Concat matched documents
@@ -86,11 +86,12 @@ async function runQuery() {
     ${query}
     """
 
-    Answer as markdown (including related code snippets if available):
+    Answer as markdown including related code snippets if available.
+    Include the source links for relevant content formatted as Markdown footnotes:
   `;
 
   const completionResponse = await openai.createCompletion({
-    model: "text-davinci-003",
+    model: 'text-davinci-003',
     prompt,
     max_tokens: 512, // Max allowed tokens in completion
     temperature: 0, // Set to 0 for deterministic results
