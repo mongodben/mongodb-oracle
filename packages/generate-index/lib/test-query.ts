@@ -5,6 +5,7 @@ import createPrompt from 'prompt-sync';
 import { mongodbClient } from './mongodb';
 import { IndexedDocument } from './types'; // TODO: make this automatic
 import * as dotenv from 'dotenv';
+import { ContentDbEntry } from './types';
 dotenv.config();
 
 const MAX_TOKENS = 1500;
@@ -29,7 +30,7 @@ async function runQuery(query: string) {
   const documents = await mongodbClient
     .db('sites')
     .collection('atlas-app-services')
-    .aggregate([
+    .aggregate<ContentDbEntry>([
       {
         $search: {
           index: 'knn',
@@ -37,7 +38,7 @@ async function runQuery(query: string) {
             vector: embedding,
             path: 'embedding',
             // "filter": {<filter-specification>},
-            k: 10,
+            k: 5,
             // "score": {<options>} NOTE: not sure what this is
           },
         },
@@ -49,12 +50,11 @@ async function runQuery(query: string) {
   let tokenCount = 0;
   let contextText = '';
 
-  // TODO: see if can do something cute to include links in here
   // Concat matched documents
   for (let i = 0; i < documents.length; i++) {
     const document = documents[i];
-    const content = document.text;
-    const encoded = tokenizer.encode(content);
+    const { text, url } = document; // TODO
+    const encoded = tokenizer.encode(text);
     tokenCount += encoded.text.length;
 
     // Limit context to max 1500 tokens (configurable)
@@ -62,7 +62,7 @@ async function runQuery(query: string) {
       break;
     }
 
-    contextText += `${content.trim()}\n---\n`;
+    contextText += `CONTENT: ${text.trim()}\nSOURCE: ${url}\n---\n`;
   }
 
   const prompt = stripIndent`${oneLine`
@@ -80,8 +80,9 @@ async function runQuery(query: string) {
     ${query}
     """
 
-    Answer as markdown including related code snippets if available and relevant.
+    ${oneLine`Answer as markdown including related code snippets if available and relevant.
     Format the code examples using proper line spacing and indentation.
+    ALWAYS return a "SOURCES" part in your answer.`}
   `;
   const completionResponse = await openai.createCompletion({
     model: 'text-davinci-003',
