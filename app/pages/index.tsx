@@ -1,7 +1,7 @@
 import Head from "next/head";
-import { Body } from "@leafygreen-ui/typography";
 import Footer from "@/components/footer";
 import { CONTAINER } from "@/constants/styles";
+import Logo from "@leafygreen-ui/logo";
 
 export default function Home() {
   return (
@@ -12,7 +12,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex flex-col min-h-screen">
-        <header className="h-10 bg-red-500">Header</header>
+        <header>
+          <Logo
+            className="absolute top-6 left-6"
+            height={40}
+            name="MongoDBLogo"
+          />
+        </header>
         <div className={`${CONTAINER} flex-grow`}></div>
         <Footer
           onSubmit={() => {
