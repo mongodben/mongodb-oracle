@@ -11,7 +11,7 @@ function OracleMessage({ children }: { children: Message["children"] }) {
       <div className="bg-white border-lg-gray-dark1 border-2 px-2 py-3">
         {children}
       </div>
-      <div className="bg-lg-gray-dark1 px-2 py-1 rounded-b">
+      <div className="bg-lg-gray-dark1 px-2 py-1">
         <Disclaimer className="text-lg-gray-light3">
           Warning: Not all answers are correct!
         </Disclaimer>
