@@ -12,9 +12,15 @@ function createFakeID() {
 interface AppState {
   messages: MessageWithID[];
   askQuestion: (message: string) => void;
+  addQuestionToMessages: (message: string) => void;
+  getAnswerFromOracle: (message: string) => void;
 }
 
-const useMongoDBOracle = create<AppState>((set) => ({
+function getAnswer(question: string) {
+  return "Hello world I am the oracle!!!";
+}
+
+const useMongoDBOracle = create<AppState>((set, get) => ({
   messages: [
     {
       id: createFakeID(),
@@ -27,11 +33,29 @@ const useMongoDBOracle = create<AppState>((set) => ({
       children: "Hello world, message 2",
     },
   ],
-  askQuestion: function (message) {
+  askQuestion: function (question) {
+    get().addQuestionToMessages(question);
+    get().getAnswerFromOracle(question);
+  },
+  addQuestionToMessages: function (question) {
     set((state) => ({
       messages: [
         ...state.messages,
-        { id: createFakeID(), type: "user", children: message },
+        { id: createFakeID(), type: "user", children: question },
+      ],
+    }));
+  },
+  getAnswerFromOracle: function (question) {
+    const answer = getAnswer(question);
+
+    set((state) => ({
+      messages: [
+        ...state.messages,
+        {
+          id: createFakeID(),
+          type: "oracle",
+          children: answer,
+        },
       ],
     }));
   },
