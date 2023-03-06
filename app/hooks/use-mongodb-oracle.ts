@@ -14,22 +14,31 @@ interface AppState {
   status: "first-load" | "error" | "loading" | "done";
   askQuestion: (message: string) => void;
   addQuestionToMessages: (message: string) => void;
-  getAnswerFromOracle: (message: string) => void;
+  addAnswerToMessages: (message: string) => void;
 }
 
+// TODO: Replace entire method with something that actually
+// hits an endpoint!
 async function getAnswer(question: string) {
   const response = await fetch("http://localhost:3000/api/ask");
-  const message = await response.json();
+  const data = await response.json();
 
-  return message.answer;
+  return data.data.answer;
 }
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
   messages: [],
   status: "first-load",
-  askQuestion: function (question) {
+  askQuestion: async function (question) {
+    set(() => ({
+      status: "loading",
+    }));
     get().addQuestionToMessages(question);
-    get().getAnswerFromOracle(question);
+    const answer = await getAnswer(question);
+    get().addAnswerToMessages(answer);
+    set(() => ({
+      status: "done",
+    }));
   },
   addQuestionToMessages: function (question) {
     set((state) => ({
@@ -39,9 +48,7 @@ const useMongoDBOracle = create<AppState>((set, get) => ({
       ],
     }));
   },
-  getAnswerFromOracle: async function (question) {
-    const answer = await getAnswer(question);
-
+  addAnswerToMessages: async function (answer) {
     set((state) => ({
       messages: [
         ...state.messages,
