@@ -7,7 +7,7 @@ export interface Message {
 
 function OracleMessage({ children }: { children: Message["children"] }) {
   return (
-    <li className="pr-20">
+    <li className="pr-20 fade-in">
       <div className="bg-white border-lg-gray-dark1 border-2 px-2 py-3">
         {children}
       </div>
@@ -22,7 +22,7 @@ function OracleMessage({ children }: { children: Message["children"] }) {
 
 function UserMessage({ children }: { children: Message["children"] }) {
   return (
-    <li className="pl-20">
+    <li className="pl-20 fade-in">
       <div className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none">
         {children}
       </div>

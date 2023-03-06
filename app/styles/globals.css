@@ -78,4 +78,11 @@ html {
   src: url('../assets/fonts/MongoDBValueSerif-Regular.ttf') format('truetype');
 }
 
+.fade-in {
+  animation-name: fade-in;
+  animation-duration: 0.1s;
+  animation-fill-mode: backwards;
+  animation-timing-function: cubic-bezier(.76,0,.24,1);
+}
+
 @tailwind utilities;
