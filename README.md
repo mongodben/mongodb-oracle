@@ -27,12 +27,10 @@ Notable not doing:
 
 ### Web Server Backend
 
-- [ ] TypeScript/Next.js server routes with endpoints to perform the following:
-  - [ ] respond to natural language user queries in natural language response
-        with accurate data from the indexed site. Format answers in Markdown
-        with links to relevant content on the site.
-- [ ] Use AI embedding API to create and query embeddings for site data. Use Atlas Search `$knnBeta` operator for this.
-- [ ] Use LLM AI to summarize results from query.
+- [ ] TypeScript/Next.js server routes with endpoint to respond to natural language user queries in natural language response
+      with accurate data from the indexed site. Format answers in Markdown with links to relevant content on the site.
+   - Use AI embedding API to create and query embeddings for site data. Use Atlas Search `$knnBeta` operator for this.
+   - Use LLM AI to summarize results from query.
 - [ ] Hosting/deployment covered by whichever Next.js hosting platform decided (Netlify, Vercel, etc.)
 
 ### Index Search Data
