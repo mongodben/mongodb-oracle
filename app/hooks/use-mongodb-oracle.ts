@@ -25,16 +25,16 @@ async function getAnswer(question: string) {
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
   messages: [
-    {
-      id: createFakeID(),
-      type: "user",
-      children: "Hello world, message 1",
-    },
-    {
-      id: createFakeID(),
-      type: "oracle",
-      children: "Hello world, message 2",
-    },
+    // {
+    //   id: createFakeID(),
+    //   type: "user",
+    //   children: "Hello world, message 1",
+    // },
+    // {
+    //   id: createFakeID(),
+    //   type: "oracle",
+    //   children: "Hello world, message 2",
+    // },
   ],
   askQuestion: function (question) {
     get().addQuestionToMessages(question);

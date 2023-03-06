@@ -4,6 +4,7 @@ import Message from "@/components/message";
 import { CONTAINER } from "@/styles/constants";
 import Logo from "@leafygreen-ui/logo";
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
+import Intro from "@/components/intro";
 
 export default function Home() {
   const messages = useMongoDBOracle((state) => state.messages);
@@ -23,13 +24,18 @@ export default function Home() {
             name="MongoDBLogo"
           />
         </header>
-        <ul className={`${CONTAINER} flex-grow space-y-2 flex flex-col`}>
-          {messages.map(({ id, type, children }) => (
-            <Message key={id} type={type}>
-              {children}
-            </Message>
-          ))}
-        </ul>
+        <div className={`${CONTAINER} flex-grow`}>
+          {messages.length === 0 && <Intro />}
+          {messages.length > 0 && (
+            <ul className="flex-grow space-y-2 flex flex-col">
+              {messages.map(({ id, type, children }) => (
+                <Message key={id} type={type}>
+                  {children}
+                </Message>
+              ))}
+            </ul>
+          )}
+        </div>
         <Footer />
       </main>
     </>
