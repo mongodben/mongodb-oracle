@@ -41,6 +41,8 @@ Notable not doing:
 
 - [ ] Store site data in MongoDB Atlas.
 - [ ] Use Atlas Search with the [knnBeta](https://www.mongodb.com/docs/atlas/atlas-search/knn-beta/) to query embeddings.
+- [ ] Set up development and production cluster
+- [ ] Create script to automate index creation
 
 ### Post MVP Features
 
