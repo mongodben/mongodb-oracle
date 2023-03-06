@@ -16,8 +16,11 @@ interface AppState {
   getAnswerFromOracle: (message: string) => void;
 }
 
-function getAnswer(question: string) {
-  return "Hello world I am the oracle!!!";
+async function getAnswer(question: string) {
+  const response = await fetch("http://localhost:3000/api/ask");
+  const message = await response.json();
+
+  return message.answer;
 }
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
@@ -45,8 +48,8 @@ const useMongoDBOracle = create<AppState>((set, get) => ({
       ],
     }));
   },
-  getAnswerFromOracle: function (question) {
-    const answer = getAnswer(question);
+  getAnswerFromOracle: async function (question) {
+    const answer = await getAnswer(question);
 
     set((state) => ({
       messages: [
