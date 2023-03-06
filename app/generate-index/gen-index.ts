@@ -30,7 +30,6 @@ export async function genIndex(
     const pageChunks = chunkPage(page, options.maxTokens!);
     chunkedDocs.push(...pageChunks);
   }
-  console.log("Chunked docs:", chunkedDocs);
   let dbEntries: ContentDbEntry[] = [];
   for await (let chunk of chunkedDocs) {
     const embedding = await createEmbedding(chunk.text, options.embeddingModel);
