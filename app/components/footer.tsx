@@ -10,7 +10,7 @@ export default function Footer() {
   const [inputValue, setInputValue] = useState("");
 
   return (
-    <footer className={`${CONTAINER}`}>
+    <footer className={`${CONTAINER} mb-4 md:mb-8 mt-auto`}>
       <form
         onSubmit={(event) => {
           event.preventDefault();

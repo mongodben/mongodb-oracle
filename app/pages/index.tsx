@@ -4,7 +4,6 @@ import Message from "@/components/message";
 import { CONTAINER } from "@/styles/constants";
 import Logo from "@leafygreen-ui/logo";
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
-import Intro from "@/components/intro";
 import Oracle from "@/components/oracle";
 import { H2, Body } from "@leafygreen-ui/typography";
 
@@ -18,15 +17,13 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex flex-col min-h-screen pt-4">
+      <main className="flex flex-col h-screen pt-4">
         <header className={`${CONTAINER}`}>
           <Logo
             className="md:absolute top-6 left-6"
             height={40}
             name="MongoDBLogo"
           />
-        </header>
-        <div className={`${CONTAINER} flex-grow`}>
           <div className="flex items-center gap-4">
             <Oracle />
             <div>
@@ -40,8 +37,13 @@ export default function Home() {
               </Body>
             </div>
           </div>
+        </header>
+
+        <hr className="px-4 max-w-[320px] border-2 mx-auto w-full rounded border-lg-green-dark2 my-4" />
+
+        <div className={`${CONTAINER} flex-grow overflow-y-scroll h-[500px]`}>
           {messages.length > 0 && (
-            <ul className="flex-grow space-y-2 flex flex-col mt-8">
+            <ul className="flex-grow space-y-2 flex flex-col overflow-hidden">
               {messages.map(({ id, type, children }) => (
                 <Message key={id} type={type}>
                   {children}
