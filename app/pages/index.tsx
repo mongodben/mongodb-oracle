@@ -1,9 +1,13 @@
 import Head from "next/head";
 import Footer from "@/components/footer";
-import { CONTAINER } from "@/constants/styles";
+import Message from "@/components/message";
+import { CONTAINER } from "@/styles/constants";
 import Logo from "@leafygreen-ui/logo";
+import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
 export default function Home() {
+  const messages = useMongoDBOracle((state) => state.messages);
+
   return (
     <>
       <Head>
@@ -19,12 +23,14 @@ export default function Home() {
             name="MongoDBLogo"
           />
         </header>
-        <div className={`${CONTAINER} flex-grow`}></div>
-        <Footer
-          onSubmit={() => {
-            console.log("Hello world!");
-          }}
-        />
+        <ul className={`${CONTAINER} flex-grow space-y-2 flex flex-col`}>
+          {messages.map(({ type, children }) => (
+            <Message key={children} type={type}>
+              {children}
+            </Message>
+          ))}
+        </ul>
+        <Footer />
       </main>
     </>
   );
