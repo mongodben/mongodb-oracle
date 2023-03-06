@@ -1,18 +1,18 @@
-import GPT3Tokenizer from 'gpt3-tokenizer';
-import { Configuration, OpenAIApi } from 'openai';
-import { stripIndent, oneLine } from 'common-tags';
-import createPrompt from 'prompt-sync';
-import { mongodbClient } from './mongodb';
-import { IndexedDocument } from './types'; // TODO: make this automatic
-import * as dotenv from 'dotenv';
-import { ContentDbEntry } from './types';
+import GPT3Tokenizer from "gpt3-tokenizer";
+import { Configuration, OpenAIApi } from "openai";
+import { stripIndent, oneLine } from "common-tags";
+import createPrompt from "prompt-sync";
+import { mongodbClient } from "./mongodb";
+import { IndexedDocument } from "./types"; // TODO: make this automatic
+import * as dotenv from "dotenv";
+import { ContentDbEntry } from "./types";
 dotenv.config();
 
 const MAX_TOKENS = 1500;
 const { OPENAI_API_KEY, OPENAI_EMBEDDING_QUERY_MODEL } = process.env;
 
 async function runQuery(query: string) {
-  const input = query.replace(/\n/g, ' ');
+  const input = query.replace(/\n/g, " ");
   const openai = new OpenAIApi(new Configuration({ apiKey: OPENAI_API_KEY }));
 
   // Generate a one-time embedding for the query itself
@@ -28,17 +28,17 @@ async function runQuery(query: string) {
   // smaller sections at earlier pre-processing/embedding step.
   // TODO: replace w mongodb stuff. right now just janky stubbed out
   const documents = await mongodbClient
-    .db('sites')
-    .collection('atlas-app-services')
+    .db("mongodb-oracle")
+    .collection("page-data")
     .aggregate<ContentDbEntry>([
       {
         $search: {
-          index: 'knn',
+          // index: "knn",
           knnBeta: {
             vector: embedding,
-            path: 'embedding',
+            path: "embedding",
             // "filter": {<filter-specification>},
-            k: 5,
+            k: 3,
             // "score": {<options>} NOTE: not sure what this is
           },
         },
@@ -46,9 +46,9 @@ async function runQuery(query: string) {
     ])
     .toArray();
 
-  const tokenizer = new GPT3Tokenizer({ type: 'gpt3' });
+  const tokenizer = new GPT3Tokenizer({ type: "gpt3" });
   let tokenCount = 0;
-  let contextText = '';
+  let contextText = "";
 
   // Concat matched documents
   for (let i = 0; i < documents.length; i++) {
@@ -85,7 +85,7 @@ async function runQuery(query: string) {
     ALWAYS return a "SOURCES" part in your answer.`}
   `;
   const completionResponse = await openai.createCompletion({
-    model: 'text-davinci-003',
+    model: "text-davinci-003",
     prompt,
     max_tokens: 512, // Max allowed tokens in completion
     temperature: 0, // Set to 0 for deterministic results
@@ -97,7 +97,7 @@ async function runQuery(query: string) {
   console.log(
     stripIndent`The answer to your question is:
 
-  ${text}` + '\n\n'
+  ${text}` + "\n\n"
   );
 }
 
@@ -105,19 +105,17 @@ async function run() {
   let continueSession = true;
   while (continueSession === true) {
     const userPrompt = createPrompt();
-    const query = userPrompt(
-      'What do you want to learn about Atlas App Services: '
-    );
+    const query = userPrompt("What do you want to learn about MongoDB: ");
     // OpenAI recommends replacing newlines with spaces for best results
 
     await runQuery(query);
     const toContinue = userPrompt(
-      'Do you want to ask more questions? (*/n): '
+      "Do you want to ask more questions? (*/n): "
     ).trim();
-    if (toContinue === 'n') {
+    if (toContinue === "n") {
       continueSession = false;
     } else {
-      console.log('\n');
+      console.log("\n");
     }
   }
   process.exit(0);
