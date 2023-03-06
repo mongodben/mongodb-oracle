@@ -1,6 +1,5 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
 html {
   font-family: 'Euclid Circular A', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -78,3 +77,5 @@ html {
   font-weight: 400;
   src: url('../assets/fonts/MongoDBValueSerif-Regular.ttf') format('truetype');
 }
+
+@tailwind utilities;

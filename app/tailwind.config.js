@@ -1,3 +1,5 @@
+const { palette } = require("@leafygreen-ui/palette");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,7 +8,12 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "lg-gray": palette.gray,
+        "lg-green": palette.green,
+      },
+    },
   },
   plugins: [],
 };
