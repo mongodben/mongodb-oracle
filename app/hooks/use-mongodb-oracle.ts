@@ -11,6 +11,7 @@ function createFakeID() {
 
 interface AppState {
   messages: MessageWithID[];
+  state: "error" | "loading" | "done";
   askQuestion: (message: string) => void;
   addQuestionToMessages: (message: string) => void;
   getAnswerFromOracle: (message: string) => void;
