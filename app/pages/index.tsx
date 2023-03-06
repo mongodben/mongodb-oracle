@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { Body } from "@leafygreen-ui/typography";
 
 export default function Home() {
   return (
@@ -7,7 +8,7 @@ export default function Home() {
         <title>MongoDB Oracle</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <main>Hello world!</main>
+      <Body>Hello world!</Body>
     </>
   );
 }
