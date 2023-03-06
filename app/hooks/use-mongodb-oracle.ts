@@ -11,7 +11,7 @@ function createFakeID() {
 
 interface AppState {
   messages: MessageWithID[];
-  state: "error" | "loading" | "done";
+  status: "first-load" | "error" | "loading" | "done";
   askQuestion: (message: string) => void;
   addQuestionToMessages: (message: string) => void;
   getAnswerFromOracle: (message: string) => void;
@@ -25,18 +25,8 @@ async function getAnswer(question: string) {
 }
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
-  messages: [
-    // {
-    //   id: createFakeID(),
-    //   type: "user",
-    //   children: "Hello world, message 1",
-    // },
-    // {
-    //   id: createFakeID(),
-    //   type: "oracle",
-    //   children: "Hello world, message 2",
-    // },
-  ],
+  messages: [],
+  status: "first-load",
   askQuestion: function (question) {
     get().addQuestionToMessages(question);
     get().getAnswerFromOracle(question);
