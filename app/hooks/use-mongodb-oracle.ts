@@ -1,23 +1,40 @@
 import { create } from "zustand";
 import type { Message } from "@/components/message";
 
+interface MessageWithID extends Message {
+  id: string;
+}
+
+function createFakeID() {
+  return (Math.random() + 1).toString(36).substring(7);
+}
+
 interface AppState {
-  messages: Message[];
-  addNewMessage: (message: string) => void;
+  messages: MessageWithID[];
+  askQuestion: (message: string) => void;
 }
 
 const useMongoDBOracle = create<AppState>((set) => ({
   messages: [
-    { type: "user", children: "Hello world, message 1" },
-    { type: "oracle", children: "Hello world, message 2" },
+    {
+      id: createFakeID(),
+      type: "user",
+      children: "Hello world, message 1",
+    },
+    {
+      id: createFakeID(),
+      type: "oracle",
+      children: "Hello world, message 2",
+    },
   ],
-  addNewMessage: () =>
+  askQuestion: function (message) {
     set((state) => ({
       messages: [
         ...state.messages,
-        { type: "user", children: "Hello world!!!" },
+        { id: createFakeID(), type: "user", children: message },
       ],
-    })),
+    }));
+  },
 }));
 
 export default useMongoDBOracle;

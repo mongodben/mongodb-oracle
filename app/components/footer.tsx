@@ -3,37 +3,18 @@ import TextArea from "@leafygreen-ui/text-area";
 import Play from "@leafygreen-ui/icon/dist/Play";
 import Button from "@leafygreen-ui/button";
 import { CONTAINER } from "@/styles/constants";
-
-function useForm() {
-  const ref = useRef<null | HTMLFormElement>(null);
-
-  function resetForm() {
-    if (ref.current === null) return;
-
-    ref.current.elements.question.value = "";
-  }
-
-  async function submitQuestion() {
-    if (ref.current === null) return;
-
-    const res = await fetch(`${process.env.API_URL}/ask`);
-    const posts = await res.json();
-    console.log(posts);
-  }
-
-  return { ref, resetForm };
-}
+import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
 export default function Footer() {
-  const { ref, resetForm } = useForm();
+  const askQuestion = useMongoDBOracle((state) => state.askQuestion);
 
   return (
     <footer className={`${CONTAINER}`}>
       <form
-        ref={ref}
         onSubmit={(event) => {
           event.preventDefault();
-          resetForm();
+          askQuestion(event.target.elements.question.value);
+          event.target.elements.question.value = "";
         }}
       >
         <div className="relative">
