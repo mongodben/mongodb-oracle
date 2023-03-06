@@ -34,12 +34,12 @@ export default function Home() {
             <Oracle />
             <div>
               <H2 className="text-[20px] md:text-[32px]" as="h1">
-                Hey there! I'm the Oracle!
+                Hey there! I&apos;m the Oracle!
               </H2>
               <Body className="text-[16px] mt-2">
-                I'm a MongoDB Wizard. I've spent eons pouring over the Atlas
-                documentation. Ask me how to do anything in Atlas - I'll do my
-                best to help you on your quest.
+                I&apos;m a MongoDB Wizard. I&apos;ve spent eons pouring over the
+                Atlas documentation. Ask me how to do anything in Atlas -
+                I&apos;ll do my best to help you on your quest.
               </Body>
             </div>
           </div>
