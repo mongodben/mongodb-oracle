@@ -24,8 +24,8 @@ export default function Home() {
           />
         </header>
         <ul className={`${CONTAINER} flex-grow space-y-2 flex flex-col`}>
-          {messages.map(({ type, children }) => (
-            <Message key={children} type={type}>
+          {messages.map(({ id, type, children }) => (
+            <Message key={id} type={type}>
               {children}
             </Message>
           ))}
