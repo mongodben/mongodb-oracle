@@ -17,13 +17,16 @@ interface AppState {
   addAnswerToMessages: (message: string) => void;
 }
 
-// TODO: Replace entire method with something that actually
-// hits an endpoint!
 async function getAnswer(question: string) {
-  const response = await fetch("http://localhost:3000/api/ask");
-  const data = await response.json();
-
-  return data.data.answer;
+  const response = await fetch("/api/ask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ question })
+  });
+  const { status, data } = await response.json();
+  return data.answer;
 }
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
