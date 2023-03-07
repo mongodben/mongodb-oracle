@@ -42,7 +42,7 @@ async function run() {
   const dbDocs: ContentDbEntry[] = [];
   for await (let site of sitesToIndex) {
     const siteData = await genIndex(site.url, {
-      writeToFile: `${site.name}.json`,
+      writeToFile: `generate-index/generated/${site.name}.json`,
       maxTokens: 1000,
       embeddingModel: process.env.OPENAI_EMBEDDING_MODEL as string,
     });
