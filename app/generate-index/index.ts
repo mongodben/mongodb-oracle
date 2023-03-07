@@ -1,53 +1,28 @@
 import { bulkUploadData } from "./add-data-to-atlas";
 import { genIndex } from "./gen-index";
 import * as dotenv from "dotenv";
+import { readFileSync } from "fs";
 dotenv.config({ path: ".env.local" });
+import { sitesToIndex } from "./sites-to-index";
 
 const { DB_NAME, COLLECTION_NAME } = process.env;
 
-const sitesToIndex = [
-  {
-    name: "app-services",
-    url: "https://www.mongodb.com/docs/atlas/app-services/sitemap.xml",
-    siteType: "snooty",
-  },
-  {
-    name: "realm",
-    url: "https://www.mongodb.com/docs/realm/sitemap.xml",
-    siteType: "snooty",
-  },
-  {
-    name: "manual",
-    url: "https://www.mongodb.com/docs/manual/sitemap.xml",
-    siteType: "snooty",
-  },
-  {
-    name: "atlas",
-    url: "https://www.mongodb.com/docs/atlas/sitemap.xml",
-    siteType: "snooty",
-  },
-  {
-    name: "node-driver",
-    url: "https://www.mongodb.com/docs/drivers/node/current/sitemap.xml",
-    siteType: "snooty",
-  },
-  {
-    name: "go-driver",
-    url: "https://www.mongodb.com/docs/drivers/go/current/sitemap.xml",
-    siteType: "snooty",
-  },
-];
-
 async function run() {
+  // for await (let site of sitesToIndex) {
+  //   console.log("Generating index for", site);
+  //   await genIndex(site.url, {
+  //     writeToFile: `generate-index/generated/${site.name}.json`,
+  //     maxTokens: 1000,
+  //     embeddingModel: process.env.OPENAI_EMBEDDING_MODEL as string,
+  //   });
+  //   console.log("Successfully generated index for", site);
+  // }
   const dbDocs: ContentDbEntry[] = [];
-  for await (let site of sitesToIndex) {
-    const siteData = await genIndex(site.url, {
-      writeToFile: `generate-index/generated/${site.name}.json`,
-      maxTokens: 1000,
-      embeddingModel: process.env.OPENAI_EMBEDDING_MODEL as string,
-    });
+  sitesToIndex.forEach((site) => {
+    const path = `generate-index/generated/${site.name}.json`;
+    const siteData = JSON.parse(readFileSync(path, { encoding: "utf-8" }));
     dbDocs.push(...siteData);
-  }
+  });
   await bulkUploadData(DB_NAME!, COLLECTION_NAME!, dbDocs);
 }
 console.log("starting index generation!");
