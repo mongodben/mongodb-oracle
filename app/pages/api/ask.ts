@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { stripIndent, codeBlock } from "common-tags";
-import { ChatGPT, createEmbedding } from "@/openai-client";
+import { ChatGPT, createEmbedding, moderate } from "@/openai-client";
 import { searchPages } from "@/mongodb/pages";
 import {
   getConversation,
@@ -99,6 +99,15 @@ export default async function handler(
 
   try {
     const { conversation_id, question } = RequestBody.parse(req.body);
+    const moderationResults = await moderate(question);
+    if (moderationResults.flagged) {
+      res.status(400).json(
+        error({
+          errors: ["Question contains content that failed the moderation check."],
+        })
+      );
+      return;
+    }
     const context = await createContext(question);
 
     let conversation = conversation_id
