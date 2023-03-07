@@ -1,6 +1,7 @@
 import { useRef, FormEvent, useState } from "react";
 import TextArea from "@leafygreen-ui/text-area";
-import Play from "@leafygreen-ui/icon/dist/Play";
+// @ts-ignore
+import * as Play from "@leafygreen-ui/icon/dist/Play";
 import Button from "@leafygreen-ui/button";
 import { CONTAINER } from "@/styles/constants";
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
