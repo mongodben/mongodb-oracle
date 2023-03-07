@@ -20,7 +20,6 @@ export async function genIndex(
     embeddingModel: OPENAI_EMBEDDING_MODEL as string,
   }
 ) {
-  console.log("OPTIONS::", options);
   /* Load in the file we want to do question answering over */
   const pages = await genSiteData(sitemapUrl);
 
