@@ -26,10 +26,6 @@ export function chunkPage(
       // this makes data work better with the embedding model i've heard 🤷
       currentPageChunk.text += " " + paragraph;
       currentPageChunk.numTokens! += bpe.length;
-    }
-    // special case for last element
-    else if (i === paragraphs.length - 1) {
-      pageChunks.push(currentPageChunk);
     } else {
       pageChunks.push(currentPageChunk);
       currentPageChunk = {
@@ -38,6 +34,10 @@ export function chunkPage(
         text: "",
         numTokens: 0,
       };
+    }
+    // special case for last element
+    if (i === paragraphs.length - 1) {
+      pageChunks.push(currentPageChunk);
     }
   });
   return pageChunks;

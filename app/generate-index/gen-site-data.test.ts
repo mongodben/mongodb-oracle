@@ -1,8 +1,20 @@
-import { getHtmlPages, parseSitemapToUrlList } from "./gen-site-data";
-console.debug("foo");
+import axios from "axios";
+import {
+  getHtmlPages,
+  parseSitemapToUrlList,
+  snootyHtmlToText,
+} from "./gen-site-data";
+
 test("parses all files in site", async () => {
   const testUrl =
     "https://www.mongodb.com/docs/drivers/node/current/sitemap.xml";
-  const urls = await parseSitemapToUrlList(testUrl);
-  expect(urls.length).toBe(0);
+  const { data: xml } = await axios.get(testUrl);
+  const urls = await parseSitemapToUrlList(xml);
+  const pages = await getHtmlPages(urls);
+  const parsedPages = pages.map(({ url, htmlPage }) => ({
+    url,
+    textPage: snootyHtmlToText(htmlPage),
+  }));
+  expect(urls.length).toBe(pages.length);
+  expect(urls.length).toBe(parsedPages.length);
 });
