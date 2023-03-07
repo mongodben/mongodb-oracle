@@ -84,15 +84,17 @@ async function runQuery(query: string) {
     Format the code examples using proper line spacing and indentation.
     ALWAYS return a "SOURCES" part in your answer.`}
   `;
-  const completionResponse = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt,
-    max_tokens: 512, // Max allowed tokens in completion
+  const completionResponse = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo-0301",
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 750, // Max allowed tokens in completion
     temperature: 0, // Set to 0 for deterministic results
   });
   const {
-    choices: [{ text }],
+    choices: [{ message }],
   } = completionResponse.data;
+
+  const text = message?.content || "The question could not be answered :(";
 
   console.log(
     stripIndent`The answer to your question is:
