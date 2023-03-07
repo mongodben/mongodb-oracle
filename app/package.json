@@ -10,7 +10,8 @@
     "pregenerate-index": "npx tsc --outDir ./generate-index/dist/ --module commonjs ./generate-index/*.ts ./types.d.ts ",
     "generate-index": "node generate-index/dist/",
     "postegenerate-index": "rm -rf generate-index/dist",
-    "generate-index:atlas-only": "npm run generate-index atlasOnly"
+    "generate-index:atlas-only": "npm run generate-index atlasOnly",
+    "test": "jest"
   },
   "dependencies": {
     "@leafygreen-ui/a11y": "^1.4.1",
@@ -86,6 +87,7 @@
   "devDependencies": {
     "@types/common-tags": "^1.8.1",
     "@types/html-to-text": "^9.0.0",
+    "@types/jest": "^29.4.0",
     "@types/jsdom": "^21.1.0",
     "@types/lodash.findlast": "^4.6.7",
     "@types/prompt-sync": "^4.2.0",
@@ -93,11 +95,15 @@
     "@types/react-dom": "16.9.16",
     "autoprefixer": "^10.4.13",
     "html-to-text": "^9.0.4",
+    "install": "^0.13.0",
+    "jest": "^29.5.0",
     "jquery": "^3.6.3",
     "jsdom": "^21.1.0",
+    "npm": "^9.6.0",
     "postcss": "^8.4.21",
     "prompt-sync": "^4.2.0",
     "tailwindcss": "^3.2.7",
+    "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "xml-js": "^1.6.11"
   }
