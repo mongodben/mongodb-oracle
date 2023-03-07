@@ -41,9 +41,9 @@ export async function getHtmlPages(urlList: string[]) {
     urlList.map((url) => getPageData(url))
   ).then((settledResults) =>
     settledResults
-      .filter((result) => {
+      .filter((result, i) => {
         if (result.status === "rejected") {
-          console.error(result.reason);
+          console.error("problem parsing page:", urlList[i]);
         }
         return result.status === "fulfilled";
       })
@@ -53,6 +53,8 @@ export async function getHtmlPages(urlList: string[]) {
   return htmlPages;
 }
 
+// TODO: make this script more fault tolerant w retry behavior.
+// right now fails when there are momentary internet drops
 export async function getPageData(url: string) {
   const { data: htmlPage } = await axios.get(url);
   return { url, htmlPage };
