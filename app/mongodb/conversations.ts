@@ -1,9 +1,16 @@
 import { BSON } from "mongodb";
 import clientPromise from "./connect";
 
+type Message = {
+  role: "user" | "assistant" | "system";
+  text: string;
+  id?: string;
+  parentMessageId?: string;
+};
+
 type Conversation = {
   _id: BSON.ObjectId;
-  messages: string[];
+  messages: Message[];
 };
 
 async function getConversationCollection() {
@@ -22,11 +29,15 @@ async function getConversationCollection() {
 
 export async function createConversation() {
   const conversations = await getConversationCollection();
-  const { insertedId } = await conversations.insertOne({
+  const conversation = {
     _id: new BSON.ObjectId(),
     messages: [],
-  });
-  return insertedId;
+  };
+  await conversations.insertOne(conversation);
+  return {
+    ...conversation,
+    _id: conversation._id.toHexString()
+  };
 }
 
 export async function getConversation(conversation_id: string) {
@@ -38,6 +49,25 @@ export async function getConversation(conversation_id: string) {
     throw new Error(`Conversation(${conversation_id}) not found`);
   }
 
+  return {
+    ...conversation,
+    _id: conversation._id.toHexString(),
+  };
+}
+
+export async function addMessageToConversation(
+  conversation_id: string,
+  message: Message
+) {
+  const conversations = await getConversationCollection();
+  const { value: conversation } = await conversations.findOneAndUpdate(
+    { _id: new BSON.ObjectId(conversation_id) },
+    { $push: { messages: message } },
+    { returnDocument: "after" }
+  );
+  if (!conversation) {
+    throw new Error(`Conversation(${conversation_id}) not found`);
+  }
   return {
     ...conversation,
     _id: conversation._id.toHexString(),

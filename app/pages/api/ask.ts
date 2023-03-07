@@ -4,7 +4,14 @@ import { z } from "zod";
 import { stripIndent, codeBlock } from "common-tags";
 import { ChatGPT, createEmbedding } from "@/openai-client";
 import { searchPages } from "@/mongodb/pages";
+import {
+  getConversation,
+  createConversation,
+  addMessageToConversation,
+} from "@/mongodb/conversations";
 import GPT3Tokenizer from "gpt3-tokenizer";
+import util from "util";
+import findLast from "lodash.findlast";
 
 type Data = Success | Fail | Error;
 
@@ -40,13 +47,13 @@ function error(data: Error["data"]): Error {
 
 type RequestBody = z.infer<typeof RequestBody>;
 const RequestBody = z.object({
-  // conversation_id: z.string().optional(),
+  conversation_id: z.string().optional(),
   question: z.string(),
 });
 
 type ResponseData = z.infer<typeof ResponseData>;
 const ResponseData = z.object({
-  // conversation_id: z.string(),
+  conversation_id: z.string(),
   answer: z.string(),
 });
 
@@ -91,42 +98,50 @@ export default async function handler(
   }
 
   try {
-    // const { conversation_id, message } = RequestBody.parse(req.body);
-    // const conversation = conversation_id
-    //   ? await getConversation(conversation_id)
-    //   : await createConversation();
-
-    const { question } = RequestBody.parse(req.body);
+    const { conversation_id, question } = RequestBody.parse(req.body);
     const context = await createContext(question);
-    const gptRes = await ChatGPT.sendMessage(codeBlock`
+
+    let conversation = conversation_id
+      ? await getConversation(conversation_id)
+      : await createConversation();
+
+    conversation = await addMessageToConversation(conversation._id, {
+      role: "user",
+      text: question,
+    });
+    const parentMessage = findLast(conversation.messages, (message) => {
+      return message.role === "assistant";
+    });
+
+    const gptResponse = await ChatGPT.sendMessage(
+      codeBlock`
       CONTEXT:
       ${context}
       QUESTION:
       ${question}
-    `);
+    `,
+      {
+        parentMessageId: parentMessage?.id,
+      }
+    );
+    console.log(gptResponse);
+    const { detail, ...responseMessage } = gptResponse;
 
-    // const gptFollowup = await ChatGPT.sendMessage(
-    //   stripIndent`
-    //     Context:
-    //     Question:
-    //       Can you explain that as if I were a 5 year old?
-    //   `,
-    //   {
-    //     parentMessageId: gptRes.id,
-    //   }
-    // );
-    // Use LLM AI to summarize results from query.
+    conversation = await addMessageToConversation(
+      conversation._id,
+      gptResponse
+    );
 
     res.status(200).json(
       success({
-        // conversation_id: conversation_id ?? "todo",
-        answer: gptRes.text,
+        conversation_id: conversation._id,
+        answer: responseMessage.text,
       })
     );
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       const e = error({ errors: err.issues });
-      console.error(e);
+      console.error(util.inspect(e, false, 4));
       res.status(400).json(e);
     } else {
       res.status(400).json(error({ errors: [err as object] }));
