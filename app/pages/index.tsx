@@ -1,10 +1,10 @@
 import Head from "next/head";
+import Image from "next/image";
 
 import { CONTAINER } from "@/styles/constants";
 
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
-import Logo from "@leafygreen-ui/logo";
 import { H2, Body } from "@leafygreen-ui/typography";
 
 import Oracle from "@/components/oracle";
@@ -21,25 +21,29 @@ export default function Home() {
       <Head>
         <title>MongoDB Oracle</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo/logo-only.png" />
       </Head>
       <main className="flex flex-col h-screen pt-4">
-        <header className={`${CONTAINER}`}>
-          <Logo
-            className="md:absolute top-6 left-6"
-            height={40}
-            name="MongoDBLogo"
-          />
+        <header className={`${CONTAINER} flex-row`}>
+          <div className="md:relative top-6 pb-10">
+            <Image
+              src="/logo/logo-long-cropped.png"
+              height={110}
+              width={600}
+              alt="MongoDB Oracle Logo"
+            />
+          </div>
+
           <div className="flex items-center gap-4">
             <Oracle />
             <div>
               <H2 className="text-[20px] md:text-[32px]" as="h1">
-                Hey there! I&apos;m the Oracle!
+                Hey there, I&apos;m the Oracle!
               </H2>
               <Body className="text-[16px] mt-2">
-                I&apos;m a MongoDB Wizard. I&apos;ve spent eons pouring over the
-                Atlas documentation. Ask me how to do anything in Atlas -
-                I&apos;ll do my best to help you on your quest.
+                I&apos;ve spent eons pouring over the MongoDB documentation. Ask
+                me how to do anything in MongoDB or Atlas - I&apos;ll do my best
+                to help you on your quest.
               </Body>
             </div>
           </div>
