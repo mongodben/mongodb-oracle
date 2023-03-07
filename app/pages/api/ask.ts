@@ -2,8 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { stripIndent, codeBlock } from "common-tags";
-import { ChatGPT, createEmbedding } from "../../openai";
-import { searchPages } from "../../mongodb/pages";
+import { ChatGPT, createEmbedding } from "@/openai-client";
+import { searchPages } from "@/mongodb/pages";
 import GPT3Tokenizer from "gpt3-tokenizer";
 
 type Data = Success | Fail | Error;
