@@ -4,13 +4,8 @@ import * as convert from "xml-js";
 import { JSDOM } from "jsdom";
 import { convert as convertHtmlToText } from "html-to-text";
 import axios from "axios";
-import GPT3Tokenizer from "gpt3-tokenizer";
 
 dotenv.config({ path: ".env.local" });
-
-const { OPENAI_EMBEDDING_MODEL } = process.env;
-const tokenizer = new GPT3Tokenizer({ type: "gpt3" });
-const MAX_TOKENS = 1000;
 
 type SitemapEntry = {
   /// url
@@ -19,32 +14,51 @@ type SitemapEntry = {
   };
 };
 
-async function genSiteData(siteUrl: string) {
+export async function genSiteData(siteUrl: string) {
   const { data: xml } = await axios.get(siteUrl);
-  var {
-    urlset: { url: urls },
-  } = JSON.parse(convert.xml2json(xml, { compact: true, spaces: 2 }));
-  const urlList: string[] = urls.map((url: SitemapEntry) => url.loc._text);
-
-  const textPages = await Promise.allSettled(
-    urlList.map((url) => getPageData(url))
-  ).then((settledResults) =>
-    settledResults
-      .filter((result) => result.status === "fulfilled")
-      // @ts-ignore
-      .map((fulfilled) => fulfilled.value)
-      .map(({ url, htmlPage }) => ({ url, textPage: html2text(htmlPage) }))
-  );
+  const urlList = parseSitemapToUrlList(xml);
+  const htmlPages = await getHtmlPages(urlList);
+  const textPages = htmlPages.map(({ url, htmlPage }) => ({
+    url,
+    textPage: snootyHtmlToText(htmlPage),
+  }));
 
   return textPages;
 }
 
-async function getPageData(url: string) {
+// ~~~ HELPER FUNCTIONS ~~~
+
+export function parseSitemapToUrlList(xmlSitemap: string) {
+  const {
+    urlset: { url: urls },
+  } = JSON.parse(convert.xml2json(xmlSitemap, { compact: true, spaces: 2 }));
+  const urlList: string[] = urls.map((url: SitemapEntry) => url.loc._text);
+  return urlList;
+}
+
+export async function getHtmlPages(urlList: string[]) {
+  const htmlPages = await Promise.allSettled(
+    urlList.map((url) => getPageData(url))
+  ).then((settledResults) =>
+    settledResults
+      .filter((result) => {
+        if (result.status === "rejected") {
+          console.error(result.reason);
+        }
+        return result.status === "fulfilled";
+      })
+      // @ts-ignore
+      .map((fulfilled) => fulfilled.value)
+  );
+  return htmlPages;
+}
+
+export async function getPageData(url: string) {
   const { data: htmlPage } = await axios.get(url);
   return { url, htmlPage };
 }
 
-function html2text(html: string) {
+export function snootyHtmlToText(html: string) {
   const dom = new JSDOM(html);
   const $ = require("jquery")(dom.window);
 
@@ -63,5 +77,3 @@ function html2text(html: string) {
   });
   return text;
 }
-
-export { genSiteData };
