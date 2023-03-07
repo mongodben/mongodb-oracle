@@ -50,6 +50,6 @@ export const ChatGPT = new ChatGPTAPI({
   `,
   completionParams: {
     temperature: 0.9,
-    max_tokens: 100,
+    max_tokens: 500,
   },
 });
