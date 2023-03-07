@@ -12,18 +12,15 @@ export default function Footer() {
   const askQuestion = useMongoDBOracle((state) => state.askQuestion);
   const [inputValue, setInputValue] = useState("");
 
-  function submitQuestion() {
-    const question = inputValue;
-    setInputValue("");
-    askQuestion(question);
-  }
-
   return (
     <footer className={`${CONTAINER} mb-4 md:mb-8 mt-auto`}>
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          submitQuestion();
+          if (!inputValue.trim().length) return;
+          const question = inputValue;
+          setInputValue("");
+          askQuestion(question);
         }}
       >
         <div className="relative">
@@ -36,9 +33,13 @@ export default function Footer() {
             baseFontSize={16}
             rows={4}
             name="question"
-            onKeyUp={(event) => {
-              if (event.key === ENTER_KEY) {
-                submitQuestion();
+            onKeyDown={(event) => {
+              if (event.key === ENTER_KEY) event.preventDefault();
+
+              if (event.key === ENTER_KEY && inputValue.trim().length) {
+                const question = inputValue;
+                askQuestion(question);
+                setInputValue("");
               }
             }}
           />
