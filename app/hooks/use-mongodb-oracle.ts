@@ -12,32 +12,45 @@ function createFakeID() {
 interface AppState {
   messages: MessageWithID[];
   status: "first-load" | "error" | "loading" | "done";
+  conversation_id: string | undefined;
   askQuestion: (message: string) => void;
   addQuestionToMessages: (message: string) => void;
   addAnswerToMessages: (message: string) => void;
 }
 
-// TODO: Replace entire method with something that actually
-// hits an endpoint!
-async function getAnswer(question: string) {
-  const response = await fetch("http://localhost:3000/api/ask");
-  const data = await response.json();
-
-  return data.data.answer;
+type AskParams = {
+  conversation_id?: string;
+  question: string;
+};
+async function ask({ question, conversation_id }: AskParams) {
+  const response = await fetch("/api/ask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ question, conversation_id }),
+  });
+  const { status, data } = await response.json();
+  return data;
 }
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
   messages: [],
   status: "first-load",
+  conversation_id: undefined,
   askQuestion: async function (question) {
     set(() => ({
       status: "loading",
     }));
     get().addQuestionToMessages(question);
-    const answer = await getAnswer(question);
+    const { conversation_id, answer } = await ask({
+      question,
+      conversation_id: get().conversation_id,
+    });
     get().addAnswerToMessages(answer);
     set(() => ({
       status: "done",
+      conversation_id,
     }));
   },
   addQuestionToMessages: function (question) {

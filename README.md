@@ -57,5 +57,4 @@ Once we finish the above MVP, some other nice features to add during Skunkworks 
 
 ## Understand this repo
 
-Monorepo made with [nx](https://nx.dev/getting-started/intro).
-Run `npx nx graph` to see a diagram of the dependencies of the projects.
+Most all the code is in the `app` directory, which is a Next.js app with some scripts in there.
