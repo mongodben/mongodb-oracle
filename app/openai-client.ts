@@ -29,6 +29,11 @@ export async function createEmbedding(text: string) {
   return embedding;
 }
 
+export async function moderate(text: string) {
+  const { data: { results } } = await openai.createModeration({ input: text });
+  return results[0]
+}
+
 export const ChatGPT = new ChatGPTAPI({
   apiKey: OPENAI_API_KEY,
   systemMessage: stripIndent`
