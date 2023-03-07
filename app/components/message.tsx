@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Disclaimer } from "@leafygreen-ui/typography";
 
 export interface Message {
@@ -7,7 +8,11 @@ export interface Message {
 
 function OracleMessage({ children }: { children: Message["children"] }) {
   return (
-    <li className="pr-20 fade-in">
+    <motion.li
+      initial={{ y: 15, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="pr-20"
+    >
       <div className="bg-white border-lg-gray-dark1 border-2 px-2 py-3">
         {children}
       </div>
@@ -16,17 +21,21 @@ function OracleMessage({ children }: { children: Message["children"] }) {
           Warning: Not all answers are correct!
         </Disclaimer>
       </div>
-    </li>
+    </motion.li>
   );
 }
 
 function UserMessage({ children }: { children: Message["children"] }) {
   return (
-    <li className="pl-20 fade-in">
+    <motion.li
+      initial={{ y: 15, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="pl-20"
+    >
       <div className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none">
         {children}
       </div>
-    </li>
+    </motion.li>
   );
 }
 
