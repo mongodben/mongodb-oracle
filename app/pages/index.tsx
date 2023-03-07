@@ -41,7 +41,7 @@ export default function Home() {
                 Hey there, I&apos;m the Oracle!
               </H2>
               <Body className="text-[16px] mt-2">
-                I&apos;ve spent eons pouring over the MongoDB documentation. Ask
+                I&apos;ve spent eons poring over the MongoDB documentation. Ask
                 me how to do anything in MongoDB or Atlas - I&apos;ll do my best
                 to help you on your quest.
               </Body>
