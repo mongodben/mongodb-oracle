@@ -1,4 +1,4 @@
-import { useRef, FormEvent, useState } from "react";
+import { useState } from "react";
 import TextArea from "@leafygreen-ui/text-area";
 // @ts-ignore
 import * as Play from "@leafygreen-ui/icon/dist/Play";
@@ -13,7 +13,7 @@ export default function Footer() {
   const [inputValue, setInputValue] = useState("");
 
   return (
-    <footer className={`${CONTAINER} mb-4 md:mb-8 mt-auto`}>
+    <footer className={`${CONTAINER} mb-4 md:mb-8 mt-4`}>
       <form
         onSubmit={(event) => {
           event.preventDefault();
