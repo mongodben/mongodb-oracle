@@ -1,11 +1,10 @@
 import { Configuration, OpenAIApi } from "openai";
-import { stripIndent, oneLine } from "common-tags";
+import { stripIndent } from "common-tags";
 import { ChatGPTAPI } from "chatgpt";
-// import GPT3Tokenizer from "gpt3-tokenizer";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-if(!OPENAI_API_KEY) {
-    throw new Error('Invalid/Missing environment variable: "OPENAI_API_KEY"');
+if (!OPENAI_API_KEY) {
+  throw new Error('Invalid/Missing environment variable: "OPENAI_API_KEY"');
 }
 
 const OPENAI_EMBEDDING_MODEL = process.env.OPENAI_EMBEDDING_MODEL;
@@ -15,17 +14,20 @@ if (!OPENAI_EMBEDDING_MODEL) {
   );
 }
 
-export const openai = new OpenAIApi(new Configuration({ apiKey: OPENAI_API_KEY }));
+export const openai = new OpenAIApi(
+  new Configuration({ apiKey: OPENAI_API_KEY })
+);
 
 export async function createEmbedding(text: string) {
-  const { data: { data } } = await openai.createEmbedding({
+  const {
+    data: { data },
+  } = await openai.createEmbedding({
     model: OPENAI_EMBEDDING_MODEL!,
     input: text.replace(/\n/g, " "),
   });
   const { embedding } = data[0];
   return embedding;
 }
-
 
 export const ChatGPT = new ChatGPTAPI({
   apiKey: OPENAI_API_KEY,
