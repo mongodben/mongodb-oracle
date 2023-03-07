@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-index": "npx tsc --outDir ./generate-index/dist/ --module commonjs ./generate-index/*.ts ./types.d.ts && node generate-index/dist/ && rm -rf generate-index/dist"
+    "pregenerate-index": "npx tsc --outDir ./generate-index/dist/ --module commonjs ./generate-index/*.ts ./types.d.ts ",
+    "generate-index": "node generate-index/dist/",
+    "postegenerate-index": "rm -rf generate-index/dist",
+    "generate-index:atlas-only": "npm run generate-index atlasOnly"
   },
   "dependencies": {
     "@leafygreen-ui/a11y": "^1.4.1",
