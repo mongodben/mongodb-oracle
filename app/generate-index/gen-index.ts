@@ -1,12 +1,12 @@
 import * as dotenv from "dotenv";
 import { genSiteData } from "./gen-site-data";
 import * as fs from "fs";
-import { chunkPage, createEmbedding } from "./utils";
+import { chunkPage, createEmbedding } from "./gen-embeddings";
 const { OPENAI_EMBEDDING_MODEL } = process.env;
 
 dotenv.config({ path: ".env.local" });
 
-const MAX_TOKENS = 1000;
+export const MAX_TOKENS = 1000;
 
 interface GenIndexOptions {
   writeToFile?: string;
