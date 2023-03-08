@@ -38,6 +38,7 @@ export async function streamAnswer(event: {
   text: string;
 }) {
   const pusher = createPusher();
+
   return await pusher.trigger(event.conversation_id, "answer", {
     message_id: event.message_id,
     text: event.text,
