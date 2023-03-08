@@ -15,7 +15,7 @@ function OracleMessage({ children }: { children: Message["children"] }) {
     >
       <div
         dangerouslySetInnerHTML={{ __html: children }}
-        className="prose bg-white border-lg-gray-dark1 border-2 px-2 py-3"
+        className="prose bg-white border-lg-gray-dark1 border-2 px-2 py-3 overflow-x-scroll"
       />
       <div className="bg-lg-gray-dark1 px-2 py-1">
         <Disclaimer className="text-lg-gray-light3">
@@ -35,7 +35,7 @@ function UserMessage({ children }: { children: Message["children"] }) {
     >
       <div
         dangerouslySetInnerHTML={{ __html: children }}
-        className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none"
+        className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none overflow-x-scroll"
       />
     </motion.li>
   );
