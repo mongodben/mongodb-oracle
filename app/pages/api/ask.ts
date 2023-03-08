@@ -15,6 +15,9 @@ import GPT3Tokenizer from "gpt3-tokenizer";
 import util from "util";
 import findLast from "lodash.findlast";
 import { streamAnswer } from "@/pusher/server";
+import MarkdownIt from "markdown-it";
+
+const md = new MarkdownIt();
 
 type Data = Success | Fail | Error;
 
@@ -112,7 +115,9 @@ export default async function handler(
     if (moderationResults.flagged) {
       res.status(400).json(
         error({
-          errors: ["Question contains content that failed the moderation check."],
+          errors: [
+            "Question contains content that failed the moderation check.",
+          ],
         })
       );
       return;
@@ -165,9 +170,9 @@ export default async function handler(
 
     res.status(200).json(
       success({
+        answer: md.render(responseMessage.text),
         conversation_id: conversation._id,
         message_id: responseMessage.id,
-        answer: responseMessage.text,
       })
     );
   } catch (err: unknown) {

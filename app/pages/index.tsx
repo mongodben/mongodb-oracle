@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import Head from "next/head";
 import Image from "next/image";
 
@@ -50,6 +52,14 @@ export default function Home() {
     onEvent: onAnswerEvent,
   });
 
+  const messageWrapperRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!messageWrapperRef.current) return;
+    messageWrapperRef.current.scrollTop =
+      messageWrapperRef.current.scrollHeight;
+  }, [messages]);
+
   return (
     <>
       <Head>
@@ -95,6 +105,7 @@ export default function Home() {
         <hr className="px-4 max-w-[320px] border-2 mx-auto w-full rounded border-lg-green-dark2 my-4" />
 
         <div
+          ref={messageWrapperRef}
           className={`${CONTAINER} flex-grow overflow-y-scroll py-4 bg-lg-gray-dark1/5 rounded-lg`}
         >
           {messages.length > 0 && (
