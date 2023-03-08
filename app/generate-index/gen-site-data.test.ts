@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+  getPageData,
   getHtmlPages,
   parseSitemapToUrlList,
   snootyHtmlToText,
@@ -17,4 +18,13 @@ test("parses all files in site", async () => {
   }));
   expect(urls.length).toBe(pages.length);
   expect(urls.length).toBe(parsedPages.length);
+});
+
+test("fetches a single page", async () => {
+
+  const testUrl = 
+    "https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/auth/";
+
+  const pageData = await getPageData(testUrl);
+  expect(pageData.url).toBe(testUrl);
 });
