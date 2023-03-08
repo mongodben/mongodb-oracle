@@ -23,7 +23,7 @@ export async function genSiteData(siteUrl: string) {
   const htmlPages = await getHtmlPages(urlList);
   const textPages = htmlPages.map(({ url, htmlPage }) => ({
     url,
-    textPage: snootyHtmlToRst(htmlPage),
+    textPage: snootyHtmlToMarkdown(htmlPage),
   }));
 
   return textPages;
