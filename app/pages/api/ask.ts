@@ -74,7 +74,7 @@ async function createContext(question: string) {
   let contextLines: string[] = [];
   function formatContextLine(content: string, source: string) {
     return stripIndent`
-      - SOURCE: ${source}
+      - SOURCE_URL: ${source}
         CONTENT: ${content.trim().replace(/\n/g, "  ")}
     `;
   }
@@ -92,7 +92,7 @@ async function createContext(question: string) {
     contextLines.push(formatContextLine(text, url));
   }
   const context = contextLines.join("\n");
-  return context;
+  return { context, pageChunks };
 }
 
 const USE_STREAMING =
@@ -122,7 +122,7 @@ export default async function handler(
       );
       return;
     }
-    const context = await createContext(question);
+    const { context, pageChunks } = await createContext(question);
 
     let conversation = conversation_id
       ? await getConversation(conversation_id)
@@ -147,8 +147,17 @@ export default async function handler(
       codeBlock`
       CONTEXT:
       ${context}
+
       QUESTION:
+      """
       ${question}
+      """
+
+      Include a list of "SOURCES" at the bottom of the response.
+      Only use links in the SOURCE_URL in the CONTEXT information above.
+      NEVER use a link not present in the CONTEXT information. Format the links
+      as Markdown links, such as [https://example.com](https://example.com).
+      ONLY include links in the "SOURCES" section.
     `,
       {
         parentMessageId: parentMessage?.id,
