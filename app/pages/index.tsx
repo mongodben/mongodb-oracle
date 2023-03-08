@@ -8,14 +8,49 @@ import { CONTAINER } from "@/styles/constants";
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
 import { H2, Body } from "@leafygreen-ui/typography";
-
+import { PusherAnswerEvent } from "@/pusher/server";
+import usePusherChannel from "@/hooks/use-pusher-channel";
 import Footer from "@/components/footer";
 import Message from "@/components/message";
 import Loader from "@/components/loader";
+import { useCallback } from "react";
 
 export default function Home() {
-  const messages = useMongoDBOracle((state) => state.messages);
-  const status = useMongoDBOracle((state) => state.status);
+  const {
+    messages,
+    status,
+    conversation_id,
+    addAnswerToMessages,
+    updateMessageAtIndex,
+    getMessageIndex,
+  } = useMongoDBOracle((state) => ({
+    messages: state.messages,
+    status: state.status,
+    conversation_id: state.conversation_id,
+    addAnswerToMessages: state.addAnswerToMessages,
+    updateMessageAtIndex: state.updateMessageAtIndex,
+    getMessageIndex: state.getMessageIndex,
+  }));
+
+  const onAnswerEvent = useCallback(
+    ({ message_id, text }: PusherAnswerEvent) => {
+      let message_index = getMessageIndex(message_id);
+      if (message_index === -1) {
+        message_index = addAnswerToMessages(message_id, text);
+      }
+      updateMessageAtIndex(message_index, (message) => ({
+        ...message,
+        children: text,
+      }));
+    },
+    [getMessageIndex, addAnswerToMessages, updateMessageAtIndex]
+  );
+
+  usePusherChannel({
+    channelName: conversation_id,
+    eventName: "answer",
+    onEvent: onAnswerEvent,
+  });
 
   const messageWrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -42,7 +77,6 @@ export default function Home() {
               alt="MongoDB Oracle Logo"
             />
           </div>
-
           <div className="relative flex items-center justify-center animate-[floating_6s_cubic-bezier(.76,0,.24,1)_infinite] select-none">
             <div className="text-[140px]">🧙</div>
             <div className="absolute bottom-0 text-[70px]">🔮</div>
@@ -53,7 +87,6 @@ export default function Home() {
               🫲
             </div>
           </div>
-
           {/* <Oracle /> */}
           {status === "first-load" && (
             <div>

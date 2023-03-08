@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Disclaimer } from "@leafygreen-ui/typography";
 
-export interface Message {
+export interface ClientMessage {
   type: "user" | "oracle";
   children: string;
 }
 
-function OracleMessage({ children }: { children: Message["children"] }) {
+function OracleMessage({ children }: { children: ClientMessage["children"] }) {
   return (
     <motion.li
       initial={{ y: 15, opacity: 0 }}
@@ -26,7 +26,7 @@ function OracleMessage({ children }: { children: Message["children"] }) {
   );
 }
 
-function UserMessage({ children }: { children: Message["children"] }) {
+function UserMessage({ children }: { children: ClientMessage["children"] }) {
   return (
     <motion.li
       initial={{ y: 15, opacity: 0 }}
@@ -41,7 +41,7 @@ function UserMessage({ children }: { children: Message["children"] }) {
   );
 }
 
-export default function Message({ type, children }: Message) {
+export default function Message({ type, children }: ClientMessage) {
   switch (type) {
     case "oracle":
       return <OracleMessage>{children}</OracleMessage>;

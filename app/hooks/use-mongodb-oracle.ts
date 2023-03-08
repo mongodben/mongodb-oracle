@@ -1,29 +1,33 @@
 import { create } from "zustand";
-import type { Message } from "@/components/message";
+import type { ClientMessage } from "@/components/message";
+import { ObjectId } from "bson";
 
-interface MessageWithID extends Message {
+export interface MessageWithID extends ClientMessage {
   id: string;
-}
-
-function createFakeID() {
-  return (Math.random() + 1).toString(36).substring(7);
 }
 
 interface AppState {
   messages: MessageWithID[];
-  status: "first-load" | "error" | "loading" | "done";
+  status: "first-load" | "error" | "loading" | "streaming" | "done";
   conversation_id: string | undefined;
-  askQuestion: (message: string) => void;
-  addQuestionToMessages: (message: string) => void;
-  addAnswerToMessages: (message: string) => void;
+  askQuestion: (message: string, config?: { stream?: boolean }) => void;
+  addQuestionToMessages: (question: string) => number;
+  addAnswerToMessages: (id: string, message: string) => number;
+  updateMessageAtIndex: (
+    index: number,
+    update: (message: MessageWithID) => MessageWithID
+  ) => void;
+  getMessageIndex: (message_id: string) => number;
 }
 
 type AskParams = {
   conversation_id?: string;
   question: string;
+  stream?: boolean;
 };
-async function ask({ question, conversation_id }: AskParams) {
-  const response = await fetch("/api/ask", {
+
+async function ask({ question, conversation_id, stream=false }: AskParams) {
+  const response = await fetch(`/api/ask?stream=${stream}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -37,42 +41,76 @@ async function ask({ question, conversation_id }: AskParams) {
 const useMongoDBOracle = create<AppState>((set, get) => ({
   messages: [],
   status: "first-load",
-  conversation_id: undefined,
-  askQuestion: async function (question) {
+  conversation_id: new ObjectId().toHexString(),
+  askQuestion: async function (question, { stream=false }={}) {
     set(() => ({
       status: "loading",
     }));
     get().addQuestionToMessages(question);
-    const { conversation_id, answer } = await ask({
+    const { conversation_id, message_id, answer } = await ask({
       question,
       conversation_id: get().conversation_id,
+      stream,
     });
-    get().addAnswerToMessages(answer);
+    if(!stream) {
+      get().addAnswerToMessages(message_id, answer);
+    }
     set(() => ({
       status: "done",
       conversation_id,
     }));
   },
   addQuestionToMessages: function (question) {
-    set((state) => ({
-      messages: [
-        ...state.messages,
-        { id: createFakeID(), type: "user", children: question },
-      ],
-    }));
+    let messageIndex = get().messages.length;
+    set((state) => {
+      return {
+        messages: [
+          ...state.messages,
+          {
+            id: new ObjectId().toHexString(),
+            type: "user",
+            children: question,
+          },
+        ],
+      };
+    });
+    return messageIndex;
   },
-  addAnswerToMessages: async function (answer) {
-    set((state) => ({
-      messages: [
-        ...state.messages,
-        {
-          id: createFakeID(),
-          type: "oracle",
-          children: answer,
-        },
-      ],
-    }));
+  addAnswerToMessages: function (id, answer) {
+    let messageIndex = get().messages.length;
+    set((state) => {
+      return {
+        messages: [
+          ...state.messages,
+          {
+            id,
+            type: "oracle",
+            children: answer,
+          },
+        ],
+      };
+    });
+    return messageIndex;
   },
+  updateMessageAtIndex: function (
+    index: number,
+    update: (message: MessageWithID) => MessageWithID
+  ) {
+    set((state) => {
+      const messages = [...state.messages];
+      messages[index] = update(messages[index]);
+      return {
+        status: "streaming",
+        messages,
+      };
+    });
+  },
+  getMessageIndex: function (message_id: string) {
+    const messages = get().messages;
+    return messages.findIndex((message) => {
+      return message.id === message_id
+    });
+  }
 }));
 
 export default useMongoDBOracle;

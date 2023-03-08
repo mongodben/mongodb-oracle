@@ -4,7 +4,9 @@ import { z } from "zod";
 import { stripIndent, codeBlock } from "common-tags";
 import { ChatGPT, createEmbedding, moderate } from "@/openai-client";
 import { searchPages } from "@/mongodb/pages";
+import { BSON } from "mongodb";
 import {
+  ServerMessage,
   getConversation,
   createConversation,
   addMessageToConversation,
@@ -12,6 +14,7 @@ import {
 import GPT3Tokenizer from "gpt3-tokenizer";
 import util from "util";
 import findLast from "lodash.findlast";
+import { streamAnswer } from "@/pusher/server";
 import MarkdownIt from "markdown-it";
 
 const md = new MarkdownIt();
@@ -57,6 +60,7 @@ const RequestBody = z.object({
 type ResponseData = z.infer<typeof ResponseData>;
 const ResponseData = z.object({
   conversation_id: z.string(),
+  message_id: z.string(),
   answer: z.string(),
 });
 
@@ -91,6 +95,9 @@ async function createContext(question: string) {
   return context;
 }
 
+const USE_STREAMING =
+  process.env.NEXT_PUBLIC_USE_STREAMING === "true" ? true : false;
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -99,6 +106,8 @@ export default async function handler(
     res.status(405).json(error({ errors: ["Method not allowed"] }));
     return;
   }
+
+  const shouldStream = USE_STREAMING && Boolean(req.query.stream);
 
   try {
     const { conversation_id, question } = RequestBody.parse(req.body);
@@ -119,10 +128,17 @@ export default async function handler(
       ? await getConversation(conversation_id)
       : await createConversation();
 
-    conversation = await addMessageToConversation(conversation._id, {
+    const questionMessage = {
+      id: new BSON.ObjectId().toHexString(),
       role: "user",
       text: question,
-    });
+    } as ServerMessage;
+
+    conversation = await addMessageToConversation(
+      conversation._id,
+      questionMessage
+    );
+
     const parentMessage = findLast(conversation.messages, (message) => {
       return message.role === "assistant";
     });
@@ -136,9 +152,15 @@ export default async function handler(
     `,
       {
         parentMessageId: parentMessage?.id,
+        onProgress: !shouldStream ? undefined : ({ id: message_id, text }) => {
+          streamAnswer({
+            conversation_id: conversation._id,
+            message_id,
+            text: md.render(text),
+          });
+        },
       }
     );
-    console.log(gptResponse);
     const { detail, ...responseMessage } = gptResponse;
 
     conversation = await addMessageToConversation(
@@ -150,6 +172,7 @@ export default async function handler(
       success({
         answer: md.render(responseMessage.text),
         conversation_id: conversation._id,
+        message_id: responseMessage.id,
       })
     );
   } catch (err: unknown) {
