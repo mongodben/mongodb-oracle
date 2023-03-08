@@ -3,9 +3,10 @@ import * as dotenv from "dotenv";
 import * as convert from "xml-js";
 import { JSDOM } from "jsdom";
 import { convert as convertHtmlToText } from "html-to-text";
-import { NodeHtmlMarkdown } from "node-html-markdown";
 import { snootyMarkdownTranslator } from "./snootyMarkdownTranslator";
+import { NodeHtmlMarkdown, NodeHtmlMarkdownOptions } from "node-html-markdown";
 import axios from "axios";
+import axiosRetry from "axios-retry";
 
 dotenv.config({ path: ".env.local" });
 
@@ -22,7 +23,7 @@ export async function genSiteData(siteUrl: string) {
   const htmlPages = await getHtmlPages(urlList);
   const textPages = htmlPages.map(({ url, htmlPage }) => ({
     url,
-    textPage: snootyHtmlToText(htmlPage),
+    textPage: snootyHtmlToRst(htmlPage),
   }));
 
   return textPages;
@@ -56,6 +57,7 @@ export async function getHtmlPages(urlList: string[]) {
 }
 
 export async function getPageData(url: string) {
+  axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
   const { data: htmlPage } = await axios.get(url);
   return { url, htmlPage };
 }
@@ -72,10 +74,7 @@ export function snootyHtmlToMarkdown(html: string) {
   const htmlContent = getPageBody(html);
 
   // TODO: cache this rather than instantiating for each url
-  const nhm = new NodeHtmlMarkdown(
-    {},
-    snootyMarkdownTranslator,
-  );
+  const nhm = new NodeHtmlMarkdown({}, snootyMarkdownTranslator);
   const mdContent = nhm.translate(htmlContent);
 
   return mdContent;
