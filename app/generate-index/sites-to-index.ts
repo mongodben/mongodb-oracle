@@ -81,7 +81,6 @@ export const sitesToIndex = [
     url: "https://www.mongodb.com/docs/kafka-connector/current/sitemap.xml",
     siteType: "snooty",
   },
-  // TODO: start reindex from here
   {
     name: "bi-connector",
     url: "https://www.mongodb.com/docs/bi-connector/master/sitemap.xml",
@@ -92,6 +91,5 @@ export const sitesToIndex = [
     url: "https://www.mongodb.com/docs/spark-connector/current/sitemap.xml",
     siteType: "snooty",
   },
-
   // TODO: what else
 ];
