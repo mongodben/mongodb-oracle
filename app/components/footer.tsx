@@ -8,6 +8,9 @@ import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
 const ENTER_KEY = "Enter";
 
+const USE_STREAMING =
+  process.env.NEXT_PUBLIC_USE_STREAMING === "true" ? true : false;
+
 export default function Footer() {
   const askQuestion = useMongoDBOracle((state) => state.askQuestion);
   const [inputValue, setInputValue] = useState("");
@@ -16,7 +19,7 @@ export default function Footer() {
     if (!inputValue.trim().length) return;
     const question = inputValue;
     setInputValue("");
-    askQuestion(question, { stream: true });
+    askQuestion(question, { stream: USE_STREAMING });
   }
 
   return (

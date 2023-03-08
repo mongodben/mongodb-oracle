@@ -41,7 +41,7 @@ export default function Home() {
         children: text,
       }));
     },
-    [messages, addAnswerToMessages, updateMessageAtIndex]
+    [getMessageIndex, addAnswerToMessages, updateMessageAtIndex]
   );
 
   usePusherChannel({

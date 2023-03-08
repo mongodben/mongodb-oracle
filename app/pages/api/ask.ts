@@ -92,7 +92,8 @@ async function createContext(question: string) {
   return context;
 }
 
-const USE_STREAMING = process.env.USE_STREAMING === "true" ? true : false;
+const USE_STREAMING =
+  process.env.NEXT_PUBLIC_USE_STREAMING === "true" ? true : false;
 
 export default async function handler(
   req: NextApiRequest,
