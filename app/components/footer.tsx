@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import TextArea from "@leafygreen-ui/text-area";
 // @ts-ignore
 import * as Play from "@leafygreen-ui/icon/dist/Play";
@@ -12,15 +12,20 @@ export default function Footer() {
   const askQuestion = useMongoDBOracle((state) => state.askQuestion);
   const [inputValue, setInputValue] = useState("");
 
+  const handleFormSubmit = () => {
+    if (!inputValue.trim().length) return;
+    const question = inputValue;
+    setInputValue("");
+    askQuestion(question, { stream: true });
+  }
+
   return (
     <footer className={`${CONTAINER} mb-4 md:mb-8 mt-4`}>
       <form
+        id="question-form"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!inputValue.trim().length) return;
-          const question = inputValue;
-          setInputValue("");
-          askQuestion(question);
+          handleFormSubmit()
         }}
       >
         <div className="relative">
@@ -34,13 +39,11 @@ export default function Footer() {
             rows={4}
             name="question"
             onKeyDown={(event) => {
-              if (event.key === ENTER_KEY) event.preventDefault();
-
-              if (event.key === ENTER_KEY && inputValue.trim().length) {
-                const question = inputValue;
-                askQuestion(question);
-                setInputValue("");
+              if (event.key === ENTER_KEY) {
+                event.preventDefault();
+                handleFormSubmit();
               }
+
             }}
           />
           <Button
