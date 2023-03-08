@@ -3,6 +3,8 @@ import * as dotenv from "dotenv";
 import * as convert from "xml-js";
 import { JSDOM } from "jsdom";
 import { convert as convertHtmlToText } from "html-to-text";
+import { NodeHtmlMarkdown } from "node-html-markdown";
+import { snootyMarkdownTranslator } from "./snootyMarkdownTranslator";
 import axios from "axios";
 
 dotenv.config({ path: ".env.local" });
@@ -53,22 +55,34 @@ export async function getHtmlPages(urlList: string[]) {
   return htmlPages;
 }
 
-// TODO: make this script more fault tolerant w retry behavior.
-// right now fails when there are momentary internet drops
 export async function getPageData(url: string) {
   const { data: htmlPage } = await axios.get(url);
   return { url, htmlPage };
 }
 
-export function snootyHtmlToText(html: string) {
+function getPageBody(html: string) {
   const dom = new JSDOM(html);
   const $ = require("jquery")(dom.window);
 
-  $("html").find("header").remove();
-  $("html").find("footer").remove();
-  $("html").find("nav").remove();
+  const content = $("main").html();
+  return content;
+}
 
-  const content = $("html").get()[0].innerHTML;
+export function snootyHtmlToMarkdown(html: string) {
+  const htmlContent = getPageBody(html);
+
+  // TODO: cache this rather than instantiating for each url
+  const nhm = new NodeHtmlMarkdown(
+    {},
+    snootyMarkdownTranslator,
+  );
+  const mdContent = nhm.translate(htmlContent);
+
+  return mdContent;
+}
+
+export function snootyHtmlToText(html: string) {
+  const content = getPageBody(html);
 
   const text = convertHtmlToText(content, {
     wordwrap: false,
