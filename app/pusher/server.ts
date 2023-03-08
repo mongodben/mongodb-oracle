@@ -7,7 +7,7 @@ const PUSHER_APP_ID = process.env.PUSHER_APP_ID;
 if(!PUSHER_APP_ID && USE_STREAMING) {
   throw new Error(`throw new Error('Invalid/Missing environment variable: "PUSHER_APP_ID"');`)
 }
-const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
+const PUSHER_APP_KEY = process.env.NEXT_PUBLIC_PUSHER_APP_KEY;
 if(!PUSHER_APP_KEY && USE_STREAMING) {
   throw new Error(`throw new Error('Invalid/Missing environment variable: "PUSHER_APP_KEY"');`)
 }
