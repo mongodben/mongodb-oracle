@@ -66,11 +66,6 @@ export const sitesToIndex = [
     siteType: "snooty",
   },
   {
-    name: "kafka-connector",
-    url: "https://www.mongodb.com/docs/kafka-connector/current/sitemap.xml",
-    siteType: "snooty",
-  },
-  {
     name: "atlas-cli",
     url: "https://www.mongodb.com/docs/atlas/cli/stable/sitemap.xml",
     siteType: "snooty",
@@ -80,5 +75,23 @@ export const sitesToIndex = [
     url: "https://www.mongodb.com/docs/compass/current/sitemap.xml",
     siteType: "snooty",
   },
-  // TODO: what else?
+  // Connectors
+  {
+    name: "kafka-connector",
+    url: "https://www.mongodb.com/docs/kafka-connector/current/sitemap.xml",
+    siteType: "snooty",
+  },
+  // TODO: start reindex from here
+  {
+    name: "bi-connector",
+    url: "https://www.mongodb.com/docs/bi-connector/master/sitemap.xml",
+    siteType: "snooty",
+  },
+  {
+    name: "spark-connector",
+    url: "https://www.mongodb.com/docs/spark-connector/current/sitemap.xml",
+    siteType: "snooty",
+  },
+
+  // TODO: what else
 ];
