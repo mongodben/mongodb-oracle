@@ -156,7 +156,7 @@ export default async function handler(
           streamAnswer({
             conversation_id: conversation._id,
             message_id,
-            text,
+            text: md.render(text),
           });
         },
       }
