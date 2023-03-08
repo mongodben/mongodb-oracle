@@ -75,6 +75,7 @@
     "gpt3-tokenizer": "^1.1.5",
     "lodash.findlast": "^4.6.0",
     "lorem-ipsum": "^2.0.8",
+    "markdown-it": "^13.0.1",
     "mongodb": "^5.1.0",
     "next": "^12.3.4",
     "openai": "^3.2.1",
@@ -85,11 +86,13 @@
     "zustand": "^4.3.6"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
     "@types/common-tags": "^1.8.1",
     "@types/html-to-text": "^9.0.0",
     "@types/jest": "^29.4.0",
     "@types/jsdom": "^21.1.0",
     "@types/lodash.findlast": "^4.6.7",
+    "@types/markdown-it": "^12.2.3",
     "@types/prompt-sync": "^4.2.0",
     "@types/react": "^16.14.30",
     "@types/react-dom": "16.9.16",

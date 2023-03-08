@@ -13,9 +13,10 @@ function OracleMessage({ children }: { children: Message["children"] }) {
       animate={{ y: 0, opacity: 1 }}
       className="pr-20"
     >
-      <div className="bg-white border-lg-gray-dark1 border-2 px-2 py-3">
-        {children}
-      </div>
+      <div
+        dangerouslySetInnerHTML={{ __html: children }}
+        className="prose bg-white border-lg-gray-dark1 border-2 px-2 py-3"
+      />
       <div className="bg-lg-gray-dark1 px-2 py-1">
         <Disclaimer className="text-lg-gray-light3">
           Warning: Not all answers are correct!
@@ -32,9 +33,10 @@ function UserMessage({ children }: { children: Message["children"] }) {
       animate={{ y: 0, opacity: 1 }}
       className="pl-20"
     >
-      <div className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none">
-        {children}
-      </div>
+      <div
+        dangerouslySetInnerHTML={{ __html: children }}
+        className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none"
+      />
     </motion.li>
   );
 }
