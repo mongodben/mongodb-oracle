@@ -35,7 +35,7 @@ async function run() {
   const collectionName = process.env.MD_DATA
     ? process.env.MD_COLLECTION_NAME
     : process.env.COLLECTION_NAME;
-  // await bulkUploadData(process.env.DB_NAME!, collectionName!, dbDocs);
+  await bulkUploadData(process.env.DB_NAME!, collectionName!, dbDocs);
 }
 console.log("starting index generation!");
 run().then(() => console.log("index successfully generated!"));
