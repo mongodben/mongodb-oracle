@@ -56,6 +56,6 @@ test("convert snooty html to Markdown", async () => {
   const testPage =
     "https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/";
   const { data } = await axios.get(testPage);
-  const md = snootyHtmlToMarkdown(data);
+  const md = snootyHtmlToMarkdown(data, "https://www.mongodb.com");
   expect(md.includes('"Permalink to this heading")')).toBe(false);
 });

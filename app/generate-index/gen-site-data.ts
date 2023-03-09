@@ -17,14 +17,14 @@ type SitemapEntry = {
   };
 };
 
-export async function genSiteData(siteUrl: string) {
+export async function genSiteData(siteUrl: string, baseUrl: string) {
   const { data: xml } = await axios.get(siteUrl);
   const urlList = parseSitemapToUrlList(xml);
   const htmlPages = await getHtmlPages(urlList);
   const textPages = htmlPages.map(({ url, htmlPage }) => ({
     url,
     textPage: process.env.MD_DATA
-      ? snootyHtmlToMarkdown(htmlPage)
+      ? snootyHtmlToMarkdown(htmlPage, baseUrl)
       : snootyHtmlToText(htmlPage),
   }));
 
@@ -66,23 +66,33 @@ export async function getPageData(url: string) {
 
 function getPageBody(html: string) {
   const dom = new JSDOM(html);
-  const $ = require("jquery")(dom.window);
+  let $ = require("jquery")(dom.window);
 
-  const content = $("main").html();
+  const content = $("main").html() as string;
+  $ = null;
   return content;
 }
 
 // cache on higher scope to reuse for multiple runs
-const nhm = new NodeHtmlMarkdown({}, snootyMarkdownTranslator);
-export function snootyHtmlToMarkdown(html: string) {
+export function snootyHtmlToMarkdown(html: string, baseUrl: string) {
   const htmlContent = getPageBody(html);
 
+  let nhm: NodeHtmlMarkdown | null = new NodeHtmlMarkdown(
+    {},
+    snootyMarkdownTranslator
+  );
   const mdContent = nhm.translate(htmlContent);
+  nhm = null; // force garbage collection;
 
   // Remove images added to the headings
-  const postProcessedMdContent = mdContent.replaceAll(
+  let postProcessedMdContent = mdContent.replaceAll(
     /\[!\[\]\(.*\/assets\/link\.svg\)]\(#.* "Permalink to this heading"\)/g,
     ""
+  );
+
+  postProcessedMdContent = postProcessedMdContent.replaceAll(
+    /(]\()(\/docs\/.*)(\))/g,
+    (_match, start, slug, end) => start + baseUrl + slug + end
   );
 
   return postProcessedMdContent;
