@@ -23,7 +23,9 @@ export async function genSiteData(siteUrl: string) {
   const htmlPages = await getHtmlPages(urlList);
   const textPages = htmlPages.map(({ url, htmlPage }) => ({
     url,
-    textPage: snootyHtmlToMarkdown(htmlPage),
+    textPage: process.env.MD_DATA
+      ? snootyHtmlToMarkdown(htmlPage)
+      : snootyHtmlToText(htmlPage),
   }));
 
   return textPages;
@@ -70,14 +72,20 @@ function getPageBody(html: string) {
   return content;
 }
 
+// cache on higher scope to reuse for multiple runs
+const nhm = new NodeHtmlMarkdown({}, snootyMarkdownTranslator);
 export function snootyHtmlToMarkdown(html: string) {
   const htmlContent = getPageBody(html);
 
-  // TODO: cache this rather than instantiating for each url
-  const nhm = new NodeHtmlMarkdown({}, snootyMarkdownTranslator);
   const mdContent = nhm.translate(htmlContent);
 
-  return mdContent;
+  // Remove images added to the headings
+  const postProcessedMdContent = mdContent.replaceAll(
+    /\[!\[\]\(.*\/assets\/link\.svg\)]\(#.* "Permalink to this heading"\)/g,
+    ""
+  );
+
+  return postProcessedMdContent;
 }
 
 export function snootyHtmlToText(html: string) {

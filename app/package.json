@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "pregenerate-index": "npx tsc --outDir ./generate-index/dist/ --module commonjs ./generate-index/*.ts ./types.d.ts ",
+    "pregenerate-index": "npx tsc --lib es2021 --outDir ./generate-index/dist/ --module commonjs ./generate-index/*.ts ./types.d.ts ",
     "generate-index": "node generate-index/dist/",
     "postegenerate-index": "rm -rf generate-index/dist",
     "generate-index:atlas-only": "npm run generate-index atlasOnly",
