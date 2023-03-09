@@ -28,7 +28,9 @@ async function getPageCollection() {
   if (!DB_NAME) {
     throw new Error(`Missing environment variable: "DB_NAME"`);
   }
-  const COLLECTION_NAME = process.env.COLLECTION_NAME;
+  const COLLECTION_NAME = process.env.MD_DATA
+    ? process.env.MD_COLLECTION_NAME
+    : process.env.COLLECTION_NAME;
   if (!COLLECTION_NAME) {
     throw new Error(`Missing environment variable: "COLLECTION_NAME"`);
   }
