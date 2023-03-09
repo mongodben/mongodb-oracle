@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import { genSiteData } from "./gen-site-data";
 import * as fs from "fs";
+import * as url from "url";
 import { chunkPage, createEmbedding } from "./gen-embeddings";
 const { OPENAI_EMBEDDING_MODEL } = process.env;
 
@@ -20,8 +21,9 @@ export async function genIndex(
     embeddingModel: OPENAI_EMBEDDING_MODEL as string,
   }
 ) {
+  const baseUrl = new URL(sitemapUrl).origin;
   /* Load in the file we want to do question answering over */
-  const pages = await genSiteData(sitemapUrl);
+  const pages = await genSiteData(sitemapUrl, baseUrl);
 
   let chunkedDocs: PageChunk[] = [];
 
