@@ -33,6 +33,7 @@ function OracleMessage({ children }: { children: ClientMessage["children"] }) {
             <span className="text-sm mr-2">Answer Quality:</span>
             <Tooltip
               trigger={
+                // @ts-ignore
                 <IconButton
                   disabled={userResponse === "bad"}
                   onClick={() => {
@@ -47,6 +48,7 @@ function OracleMessage({ children }: { children: ClientMessage["children"] }) {
             </Tooltip>
             <Tooltip
               trigger={
+                // @ts-ignore
                 <IconButton
                   disabled={userResponse === "good"}
                   onClick={() => {
