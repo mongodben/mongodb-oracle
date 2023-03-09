@@ -74,8 +74,9 @@ async function createContext(question: string) {
   let contextLines: string[] = [];
   function formatContextLine(content: string, source: string) {
     return stripIndent`
-      - SOURCE_URL: ${source}
-        CONTENT: ${content.trim().replace(/\n/g, "  ")}
+      SOURCE_URL: ${source}
+      CONTENT: ${content.trim().replace(/\n/g, "  ")}
+      ---
     `;
   }
   for (let i = 0; i < pageChunks.length; i++) {
@@ -144,7 +145,8 @@ export default async function handler(
     });
 
     const gptResponse = await ChatGPT.sendMessage(
-      codeBlock`
+      stripIndent`
+      Different pieces of context are separated by "---".
       CONTEXT:
       ${context}
 
@@ -154,20 +156,24 @@ export default async function handler(
       """
 
       Include a list of "SOURCES" at the bottom of the response.
-      Only use links in the SOURCE_URL in the CONTEXT information above.
-      NEVER use a link not present in the CONTEXT information. Format the links
-      as Markdown links, such as [https://example.com](https://example.com).
-      ONLY include links in the "SOURCES" section.
+      Only use links in the SOURCE_URLs from the conversation.
+      Only include the SOURCE_URL if the CONTENT next to it is used in the answer.
+      Format the links as Markdown links, such as [https://example.com](https://example.com).
+      ONLY include links in context information provided in this conversation section.
+      NEVER use a link not present in the CONTEXT information.
+      NEVER use a link that is not provided in the chat. NEVER make up a link.
     `,
       {
         parentMessageId: parentMessage?.id,
-        onProgress: !shouldStream ? undefined : ({ id: message_id, text }) => {
-          streamAnswer({
-            conversation_id: conversation._id,
-            message_id,
-            text: md.render(text),
-          });
-        },
+        onProgress: !shouldStream
+          ? undefined
+          : ({ id: message_id, text }) => {
+              streamAnswer({
+                conversation_id: conversation._id,
+                message_id,
+                text: md.render(text),
+              });
+            },
       }
     );
     const { detail, ...responseMessage } = gptResponse;
