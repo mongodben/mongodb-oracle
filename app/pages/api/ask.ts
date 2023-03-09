@@ -15,9 +15,6 @@ import GPT3Tokenizer from "gpt3-tokenizer";
 import util from "util";
 import findLast from "lodash.findlast";
 import { streamAnswer } from "@/pusher/server";
-import MarkdownIt from "markdown-it";
-
-const md = new MarkdownIt();
 
 type Data = Success | Fail | Error;
 
@@ -165,15 +162,13 @@ export default async function handler(
     `,
       {
         parentMessageId: parentMessage?.id,
-        onProgress: !shouldStream
-          ? undefined
-          : ({ id: message_id, text }) => {
-              streamAnswer({
-                conversation_id: conversation._id,
-                message_id,
-                text: md.render(text),
-              });
-            },
+        onProgress: !shouldStream ? undefined : ({ id: message_id, text }) => {
+          streamAnswer({
+            conversation_id: conversation._id,
+            message_id,
+            text: text,
+          });
+        },
       }
     );
     const { detail, ...responseMessage } = gptResponse;
@@ -185,7 +180,7 @@ export default async function handler(
 
     res.status(200).json(
       success({
-        answer: md.render(responseMessage.text),
+        answer: responseMessage.text,
         conversation_id: conversation._id,
         message_id: responseMessage.id,
       })
