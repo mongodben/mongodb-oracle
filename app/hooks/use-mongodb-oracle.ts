@@ -12,7 +12,8 @@ interface AppState {
   conversation_id: string | undefined;
   askQuestion: (message: string, config?: { stream?: boolean }) => void;
   addQuestionToMessages: (question: string) => number;
-  addAnswerToMessages: (id: string, message: string) => number;
+  addAnswerToMessages: (id: string, answer: string) => number;
+  addWarningToMessages: (id: string, message: string) => number;
   updateMessageAtIndex: (
     index: number,
     update: (message: MessageWithID) => MessageWithID
@@ -34,30 +35,53 @@ async function ask({ question, conversation_id, stream=false }: AskParams) {
     },
     body: JSON.stringify({ question, conversation_id }),
   });
-  const { status, data } = await response.json();
-  return data;
+  return await response.json();
 }
 
 const useMongoDBOracle = create<AppState>((set, get) => ({
   messages: [],
   status: "first-load",
   conversation_id: new ObjectId().toHexString(),
-  askQuestion: async function (question, { stream=false }={}) {
+  askQuestion: async function (question, { stream = false } = {}) {
     set(() => ({
       status: "loading",
     }));
     get().addQuestionToMessages(question);
-    const { conversation_id, message_id, answer } = await ask({
+    const { status, data } = await ask({
       question,
       conversation_id: get().conversation_id,
       stream,
     });
-    if(!stream) {
-      get().addAnswerToMessages(message_id, answer);
+    if (status === "error") {
+      const { errors } = data;
+      if (
+        errors[0] ===
+        "Question contains content that failed the moderation check."
+      ) {
+        get().addWarningToMessages(
+          new ObjectId().toHexString(),
+          "Question contains content that failed the moderation check."
+        );
+      }
+    } else {
+      const { message_id, answer } = data;
+      if (stream) {
+        get().updateMessageAtIndex(
+          get().getMessageIndex(message_id),
+          (message) => {
+            return {
+              ...message,
+              children: answer,
+            };
+          }
+        );
+      } else {
+        get().addAnswerToMessages(message_id, answer);
+      }
     }
     set(() => ({
       status: "done",
-      conversation_id,
+      conversation_id: get().conversation_id,
     }));
   },
   addQuestionToMessages: function (question) {
@@ -92,6 +116,23 @@ const useMongoDBOracle = create<AppState>((set, get) => ({
     });
     return messageIndex;
   },
+  addWarningToMessages: function (id, message) {
+    let messageIndex = get().messages.length;
+    set((state) => {
+      return {
+        messages: [
+          ...state.messages,
+          {
+            id,
+            type: "system",
+            children: message,
+            status: "error",
+          },
+        ],
+      };
+    });
+    return messageIndex;
+  },
   updateMessageAtIndex: function (
     index: number,
     update: (message: MessageWithID) => MessageWithID
@@ -108,9 +149,9 @@ const useMongoDBOracle = create<AppState>((set, get) => ({
   getMessageIndex: function (message_id: string) {
     const messages = get().messages;
     return messages.findIndex((message) => {
-      return message.id === message_id
+      return message.id === message_id;
     });
-  }
+  },
 }));
 
 export default useMongoDBOracle;

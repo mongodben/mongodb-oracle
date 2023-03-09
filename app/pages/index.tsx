@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { motion, useAnimationControls } from "framer-motion";
 
 import Head from "next/head";
 import Image from "next/image";
@@ -53,12 +54,24 @@ export default function Home() {
   });
 
   const messageWrapperRef = useRef<HTMLDivElement | null>(null);
+  const controls = useAnimationControls();
 
   useEffect(() => {
     if (!messageWrapperRef.current) return;
     messageWrapperRef.current.scrollTop =
       messageWrapperRef.current.scrollHeight;
   }, [messages]);
+
+  useEffect(() => {
+    switch (status) {
+      case "loading":
+        controls.start({ y: 7, x: 0 });
+        break;
+      default:
+        controls.stop();
+        break;
+    }
+  }, [status, controls]);
 
   return (
     <>
@@ -78,13 +91,37 @@ export default function Home() {
             />
           </div>
           <div className="relative flex items-center justify-center animate-[floating_6s_cubic-bezier(.76,0,.24,1)_infinite] select-none">
-            <div className="text-[140px]">🧙</div>
-            <div className="absolute bottom-0 text-[70px]">🔮</div>
-            <div className="absolute bottom-0 text-[40px] -translate-x-[20px] -translate-y-[25px] rotate-[20deg]">
-              🫱
-            </div>
-            <div className="absolute bottom-0 text-[40px] translate-x-[20px] -translate-y-[25px] rotate-[-20deg]">
-              🫲
+            <div className="relative">
+              <div className="text-[140px]">🧙</div>
+              <div className="absolute bottom-0 text-[70px] w-full text-center">
+                🔮
+              </div>
+              <div className="absolute bottom-0 text-[40px] right-[20px] top-[125px] rotate-[20deg] w-full text-center">
+                <motion.div
+                  animate={controls}
+                  initial={{ y: -7, x: -6 }}
+                  transition={{
+                    duration: 0.5,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                >
+                  🫱
+                </motion.div>
+              </div>
+              <div className="absolute bottom-0 text-[40px] left-[20px] top-[125px] rotate-[-20deg] w-full text-center">
+                <motion.div
+                  initial={{ y: -7, x: -6 }}
+                  animate={controls}
+                  transition={{
+                    duration: 0.5,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                >
+                  🫲
+                </motion.div>
+              </div>
             </div>
           </div>
           {/* <Oracle /> */}
@@ -110,8 +147,8 @@ export default function Home() {
         >
           {messages.length > 0 && (
             <ul className="flex-grow space-y-2 flex flex-col overflow-hidden">
-              {messages.map(({ id, type, children }) => (
-                <Message key={id} type={type}>
+              {messages.map(({ id, type, children, level }) => (
+                <Message key={id} type={type} level={level}>
                   {children}
                 </Message>
               ))}
