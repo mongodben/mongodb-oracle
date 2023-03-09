@@ -71,8 +71,9 @@ async function createContext(question: string) {
   let contextLines: string[] = [];
   function formatContextLine(content: string, source: string) {
     return stripIndent`
-      - SOURCE: ${source}
-        CONTENT: ${content.trim().replace(/\n/g, "  ")}
+      SOURCE_URL: ${source}
+      CONTENT: ${content.trim().replace(/\n/g, "  ")}
+      ---
     `;
   }
   for (let i = 0; i < pageChunks.length; i++) {
@@ -89,7 +90,7 @@ async function createContext(question: string) {
     contextLines.push(formatContextLine(text, url));
   }
   const context = contextLines.join("\n");
-  return context;
+  return { context, pageChunks };
 }
 
 const USE_STREAMING =
@@ -119,7 +120,7 @@ export default async function handler(
       );
       return;
     }
-    const context = await createContext(question);
+    const { context, pageChunks } = await createContext(question);
 
     let conversation = conversation_id
       ? await getConversation(conversation_id)
@@ -141,11 +142,23 @@ export default async function handler(
     });
 
     const gptResponse = await ChatGPT.sendMessage(
-      codeBlock`
+      stripIndent`
+      Different pieces of context are separated by "---".
       CONTEXT:
       ${context}
+
       QUESTION:
+      """
       ${question}
+      """
+
+      Include a list of "SOURCES" at the bottom of the response.
+      Only use links in the SOURCE_URLs from the conversation.
+      Only include the SOURCE_URL if the CONTENT next to it is used in the answer.
+      Format the links as Markdown links, such as [https://example.com](https://example.com).
+      ONLY include links in context information provided in this conversation section.
+      NEVER use a link not present in the CONTEXT information.
+      NEVER use a link that is not provided in the chat. NEVER make up a link.
     `,
       {
         parentMessageId: parentMessage?.id,
