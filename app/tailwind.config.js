@@ -11,7 +11,10 @@ module.exports = {
     extend: {
       colors: {
         "lg-gray": palette.gray,
+        "lg-red": palette.red,
         "lg-green": palette.green,
+        "lg-blue": palette.blue,
+        "lg-yellow": palette.yellow,
       },
       keyframes: {
         floating: {
