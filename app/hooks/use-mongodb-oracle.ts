@@ -27,7 +27,7 @@ type AskParams = {
   stream?: boolean;
 };
 
-async function ask({ question, conversation_id, stream=false }: AskParams) {
+async function ask({ question, conversation_id, stream = false }: AskParams) {
   const response = await fetch(`/api/ask?stream=${stream}`, {
     method: "POST",
     headers: {
