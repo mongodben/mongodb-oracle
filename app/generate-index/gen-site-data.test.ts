@@ -4,7 +4,7 @@ import {
   getHtmlPages,
   parseSitemapToUrlList,
   snootyHtmlToText,
-  getPageData,
+  snootyHtmlToMarkdown,
 } from "./gen-site-data";
 
 import { NodeHtmlMarkdown } from "node-html-markdown";
@@ -50,5 +50,12 @@ test("custom codeblock language markdown", async () => {
   const result = nhm.translate(codeElement);
 
   expect(result).toBe(expectedMarkdown);
-  console.log(result);
+});
+
+test("convert snooty html to Markdown", async () => {
+  const testPage =
+    "https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/";
+  const { data } = await axios.get(testPage);
+  const md = snootyHtmlToMarkdown(data);
+  expect(md.includes('"Permalink to this heading")')).toBe(false);
 });
