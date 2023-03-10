@@ -11,6 +11,8 @@ const ENTER_KEY = "Enter";
 const USE_STREAMING =
   process.env.NEXT_PUBLIC_USE_STREAMING === "true" ? true : false;
 
+console.log(USE_STREAMING);
+
 export default function Footer() {
   const askQuestion = useMongoDBOracle((state) => state.askQuestion);
   const [inputValue, setInputValue] = useState("");
@@ -20,7 +22,7 @@ export default function Footer() {
     const question = inputValue;
     setInputValue("");
     askQuestion(question, { stream: USE_STREAMING });
-  }
+  };
 
   return (
     <footer className={`${CONTAINER} mb-4 md:mb-8 mt-4`}>
@@ -28,7 +30,7 @@ export default function Footer() {
         id="question-form"
         onSubmit={(event) => {
           event.preventDefault();
-          handleFormSubmit()
+          handleFormSubmit();
         }}
       >
         <div className="relative">
@@ -46,7 +48,6 @@ export default function Footer() {
                 event.preventDefault();
                 handleFormSubmit();
               }
-
             }}
           />
           <Button
