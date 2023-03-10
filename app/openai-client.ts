@@ -49,7 +49,7 @@ export const ChatGPT = new ChatGPTAPI({
     If you include code snippets, make sure to use proper syntax, line spacing, and indentation.
   `,
   completionParams: {
-    temperature: 0.1,
+    temperature: 0.7,
     max_tokens: 500,
     stream: true,
   },
