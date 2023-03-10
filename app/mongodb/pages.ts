@@ -44,7 +44,7 @@ export async function searchPages(embedding: number[]) {
   const cursor = pages.aggregate<PageChunk>([
     {
       $search: {
-        // index: "knn",
+        index: "default-2",
         knnBeta: {
           vector: embedding,
           path: "embedding",

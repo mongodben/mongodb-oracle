@@ -16,17 +16,14 @@ export function rematerializeMdPages(chunkedData: ContentDbEntry[]) {
   return pageData;
 }
 
-export function wrappedRematerializeMdPages(pathIn: string, pathOut: string) {
-  const chunkedData: ContentDbEntry[] = JSON.parse(
-    fs.readFileSync(pathIn, { encoding: "utf-8" })
-  );
-  const materializedData = rematerializeMdPages(chunkedData);
-  fs.writeFileSync(pathOut, JSON.stringify(materializedData, null, 2));
-}
-
 const basePathIn = "generate-index/md-generated/";
-const basePathOut = "generate-index/md-generated-full-pages/";
+const path = "generate-index/md-generated-full-pages/all-data.json";
 const fileNames = sitesToIndex.map((site) => site.name + ".json");
-fileNames.forEach((fileName) =>
-  wrappedRematerializeMdPages(basePathIn + fileName, basePathOut + fileName)
-);
+let allData: Record<string, string> = {};
+fileNames.forEach((fileName) => {
+  const chunkedData = rematerializeMdPages(
+    JSON.parse(fs.readFileSync(basePathIn + fileName, { encoding: "utf-8" }))
+  );
+  allData = { ...allData, ...chunkedData };
+});
+fs.writeFileSync(path, JSON.stringify(allData));
