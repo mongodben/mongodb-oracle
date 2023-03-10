@@ -37,15 +37,50 @@ To learn more about this paradigm for AI-powered Q&A bots, refer to this article
 <https://dagster.io/blog/chatgpt-langchain>. We didn't use Langchain like this article,
 but we take the same approach and use the same AI APIs.
 
-TODO: find better link than above.
-
 ## Architecture
 
-TODO: add overview and perhaps diagram
+### Data Ingestion
+
+> ![etl data ingestion](assets/etl-architecture.png)
+
+### Q & A
+
+> ![Q and A ingestion](assets/q-a-architecture.png)
 
 ## Issues & Thoughts on Future Direction
 
-TODO: add some thoughts
+### Current Issues
+
+As the project currently stands, it works reasonably well. The biggest remaining issues are:
+
+1. Vector search picks up short pieces of irrelevant data, and then feeds them to
+   LLM summarization. This could be remedied by improving the quality of the data
+   ingestion scripts in the `app/generate-index` directory. Improvements could include
+   making sure that all embeddings cover some larger number of tokens (say >=500).
+1. The ChatGPT LLM can hallucinate answers if it doesn't know the real answer.
+   This is most pronounced for links, which it makes up more often than we feel
+   comfortable with. This could likely be ameliorated by reducing the temperature
+   for the LLM responses. Though due to the above issue of vector search sometimes
+   not picking up the most relevant data, reducing the temperature currently leads
+   to an unacceptable amount of 'do not know' type answers. Refining the LLM prompt
+   could also probably assist with improving the answer quality.
+
+Both of the above problems seem quite solvable. We just weren't able to address
+them because we didn't have enough time in Skunkworks for it.
+
+### Next Steps
+
+In addition to resolving the above issues, some additional features we though about
+developing but didn't have time for in Skunkworks include:
+
+1. Alternate interfaces (Slack bot, web component, etc.)
+1. Have multi-language selector so you can ask and get responses in a variety of languages.
+1. 'Productize it' so people can create their own 'MongoDB Oracle'
+   (probably with a different name 😅) for their own data.
+1. Make the index generator pluggable, so it's easy to ingest various data sources.
+1. Make the query API pluggable, so people can develop alternative interfaces.
+1. Look into using/integrating [Langchain](https://github.com/hwchase17/langchain),
+   a new popular library for building LLM-related projects.
 
 ## Skunkworks March 2023 MVP
 
