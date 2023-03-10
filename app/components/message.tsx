@@ -84,7 +84,7 @@ function UserMessage({ children }: { children: ClientMessage["children"] }) {
       animate={{ y: 0, opacity: 1 }}
       className="pl-20"
     >
-      <ReactMarkdown className="bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none overflow-x-scroll">
+      <ReactMarkdown className="prose bg-white border-lg-green-dark1 border-2 px-2 py-3 rounded-2xl rounded-tr-none overflow-x-scroll">
         {children}
       </ReactMarkdown>
     </motion.li>
