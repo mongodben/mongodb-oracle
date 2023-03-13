@@ -11,7 +11,10 @@
     "generate-index": "node --max-old-space-size=12288 generate-index/dist/",
     "postegenerate-index": "rm -rf generate-index/dist",
     "generate-index:atlas-only": "npm run generate-index atlasOnly",
-    "test": "jest"
+    "test": "jest",
+    "prerematerialize-index": "npx tsc --lib es2021 --outDir ./generate-index/dist/ --module commonjs ./generate-index/*.ts ./types.d.ts ",
+    "rematerialize-index": "node generate-index/dist/materialize-pages-from-md",
+    "postrematerialize-index": "rm -rf generate-index/dist"
   },
   "dependencies": {
     "@leafygreen-ui/a11y": "^1.4.1",

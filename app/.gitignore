@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Too big for git
+generate-index/md-generated-full-pages/all-data-chunked.json

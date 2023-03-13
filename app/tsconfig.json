@@ -23,6 +23,12 @@
     },
     "typeRoots": ["./types.d.ts", "./node_modules/@types"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "types.d.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "types.d.ts",
+    "generate-index/materialize-pages-from-md.ts"
+  ],
   "exclude": ["node_modules"]
 }
