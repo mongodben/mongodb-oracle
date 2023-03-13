@@ -19,6 +19,11 @@
     },
     "outDir": "build"
   },
-  "include": ["**/*.ts", "*.ts", "../types.d.ts"],
+  "include": [
+    "**/*.ts",
+    "*.ts",
+    "../types.d.ts",
+    "materialize-pages-from-md.ts"
+  ],
   "exclude": ["node_modules"]
 }
