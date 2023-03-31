@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import TextArea from "@leafygreen-ui/text-area";
 // @ts-ignore
 import * as Play from "@leafygreen-ui/icon/dist/Play";
+import Link from "next/link";
 import Button from "@leafygreen-ui/button";
 import { CONTAINER } from "@/styles/constants";
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
@@ -59,6 +60,13 @@ export default function Footer() {
           />
         </div>
       </form>
+      <p>
+        <span className="underline text-blue-500 border-blue-500">
+          <Link href="https://github.com/mongodben/mongodb-oracle">
+            Github Repo
+          </Link>
+        </span>
+      </p>
     </footer>
   );
 }
