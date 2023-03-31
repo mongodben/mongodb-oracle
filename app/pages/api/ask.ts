@@ -114,9 +114,7 @@ export default async function handler(
     return;
   }
   const shouldUseLlm = req.query.withLlm === "true";
-  const shouldStream = !shouldUseLlm
-    ? false
-    : USE_STREAMING && req.query.stream === "true";
+  const shouldStream = shouldUseLlm && USE_STREAMING && req.query.stream === "true";
   const { conversation_id, question } = RequestBody.parse(req.body);
 
   try {
