@@ -8,13 +8,13 @@ import { CONTAINER } from "@/styles/constants";
 
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
-import { H2, Body } from "@leafygreen-ui/typography";
 import { PusherAnswerEvent } from "@/pusher/server";
 import usePusherChannel from "@/hooks/use-pusher-channel";
 import Footer from "@/components/footer";
 import Message from "@/components/message";
 import Loader from "@/components/loader";
 import { useCallback } from "react";
+import { appName } from "@/appConfig";
 
 export default function Home() {
   const {
@@ -76,18 +76,21 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>MongoDB Oracle</title>
+        <title>{appName}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/logo/logo-only.png" />
       </Head>
       <main className="flex flex-col h-screen pt-4">
         <header className={`${CONTAINER} flex-row`}>
-          <div className="w-[400px] absolute left-8 top-8">
+          <h1 className="text-center">{appName} </h1>
+
+          {/* COMMENTING OUT FOR DEMO 😢 */}
+          {/* <div className="w-[400px] absolute left-8 top-8">
             <Image
               src="/logo/logo-long-cropped.png"
               height={110}
               width={600}
-              alt="MongoDB Oracle Logo"
+              alt="${appName} Logo"
             />
           </div>
           <div className="relative flex items-center justify-center animate-[floating_6s_cubic-bezier(.76,0,.24,1)_infinite] select-none">
@@ -124,7 +127,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* <Oracle /> */}
           {status === "first-load" && (
             <div>
               <H2 className="text-[20px] md:text-[32px]" as="h1">
@@ -136,7 +138,7 @@ export default function Home() {
                 to help you on your quest.
               </Body>
             </div>
-          )}
+          )} */}
         </header>
 
         <hr className="px-4 max-w-[320px] border-2 mx-auto w-full rounded border-lg-green-dark2 my-4" />
