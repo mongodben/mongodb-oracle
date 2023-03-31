@@ -93,6 +93,15 @@ async function createContext(question: string) {
   return { context, pageChunks };
 }
 
+async function getPageResults(question: string) {
+  const embedding = await createEmbedding(question);
+  const pageChunks = await searchPages(embedding);
+  const uniqueLinks = Array.from(
+    new Set<string>(pageChunks.map((chunk) => chunk.url))
+  );
+  return uniqueLinks;
+}
+
 const USE_STREAMING =
   process.env.NEXT_PUBLIC_USE_STREAMING === "true" ? true : false;
 
@@ -104,11 +113,13 @@ export default async function handler(
     res.status(405).json(error({ errors: ["Method not allowed"] }));
     return;
   }
-
-  const shouldStream = USE_STREAMING && Boolean(req.query.stream);
+  const shouldUseLlm = req.query.withLlm === "true";
+  const shouldStream = !shouldUseLlm
+    ? false
+    : USE_STREAMING && req.query.stream === "true";
+  const { conversation_id, question } = RequestBody.parse(req.body);
 
   try {
-    const { conversation_id, question } = RequestBody.parse(req.body);
     const moderationResults = await moderate(question);
     if (moderationResults.flagged) {
       res.status(400).json(
@@ -120,11 +131,36 @@ export default async function handler(
       );
       return;
     }
-    const { context, pageChunks } = await createContext(question);
-
     let conversation = conversation_id
       ? await getConversation(conversation_id)
       : await createConversation();
+
+    if (!shouldUseLlm) {
+      console.log("skipping llm generation. just getting page results");
+      const pageResults = await getPageResults(question);
+      if (pageResults.length === 0) {
+        res.status(400).json(
+          error({
+            errors: ["Question does not match any pages in the search index."],
+          })
+        );
+        return;
+      } else {
+        const answer =
+          "Pages that match your question:\n\n" +
+          pageResults.map((link) => `- [${link}](${link})`).join("\n");
+        res.status(200).json(
+          success({
+            conversation_id: conversation._id,
+            message_id: new BSON.ObjectId().toHexString(),
+            answer,
+          })
+        );
+        return;
+      }
+    }
+    console.log("continuing on w llm generation");
+    const { context } = await createContext(question);
 
     const questionMessage = {
       id: new BSON.ObjectId().toHexString(),
@@ -162,13 +198,15 @@ export default async function handler(
     `,
       {
         parentMessageId: parentMessage?.id,
-        onProgress: !shouldStream ? undefined : ({ id: message_id, text }) => {
-          streamAnswer({
-            conversation_id: conversation._id,
-            message_id,
-            text: text,
-          });
-        },
+        onProgress: !shouldStream
+          ? undefined
+          : ({ id: message_id, text }) => {
+              streamAnswer({
+                conversation_id: conversation._id,
+                message_id,
+                text: text,
+              });
+            },
       }
     );
     const { detail, ...responseMessage } = gptResponse;
