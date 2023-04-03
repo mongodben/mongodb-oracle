@@ -12,9 +12,10 @@ const ENTER_KEY = "Enter";
 const USE_STREAMING =
   process.env.NEXT_PUBLIC_USE_STREAMING === "true" ? true : false;
 
-console.log(USE_STREAMING);
-
-export default function Footer() {
+type FooterProps = {
+  withLlm: boolean;
+};
+export default function Footer({ withLlm }: FooterProps) {
   const askQuestion = useMongoDBOracle((state) => state.askQuestion);
   const [inputValue, setInputValue] = useState("");
 
@@ -22,7 +23,7 @@ export default function Footer() {
     if (!inputValue.trim().length) return;
     const question = inputValue;
     setInputValue("");
-    askQuestion(question, { stream: USE_STREAMING });
+    askQuestion(question, { stream: withLlm ? USE_STREAMING : false, withLlm });
   };
 
   return (

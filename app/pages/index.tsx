@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
 
 import Head from "next/head";
@@ -8,6 +8,8 @@ import { CONTAINER } from "@/styles/constants";
 
 import useMongoDBOracle from "@/hooks/use-mongodb-oracle";
 
+import { H2, Body } from "@leafygreen-ui/typography";
+import Toggle from "@leafygreen-ui/toggle";
 import { PusherAnswerEvent } from "@/pusher/server";
 import usePusherChannel from "@/hooks/use-pusher-channel";
 import Footer from "@/components/footer";
@@ -32,6 +34,7 @@ export default function Home() {
     updateMessageAtIndex: state.updateMessageAtIndex,
     getMessageIndex: state.getMessageIndex,
   }));
+  const [withLlm, setWithLlm] = useState(false);
 
   const onAnswerEvent = useCallback(
     ({ message_id, text }: PusherAnswerEvent) => {
@@ -82,7 +85,19 @@ export default function Home() {
       </Head>
       <main className="flex flex-col h-screen pt-4">
         <header className={`${CONTAINER} flex-row`}>
-          <h1 className="text-center">{appName} </h1>
+          <h1 className="text-center text-2xl">{appName} </h1>
+          <div className="flex items-center justify-center pt-2">
+            <Body className="pr-3">LLM Summarization</Body>
+
+            <Toggle
+              aria-labelledby="with-lmm"
+              checked={withLlm}
+              onClick={() => {
+                setWithLlm(!withLlm);
+              }}
+              size="small"
+            />
+          </div>
 
           {/* COMMENTING OUT FOR DEMO 😢 */}
           {/* <div className="w-[400px] absolute left-8 top-8">
@@ -166,7 +181,7 @@ export default function Home() {
             </div>
           )}
         </div>
-        <Footer />
+        <Footer withLlm={withLlm} />
       </main>
     </>
   );
