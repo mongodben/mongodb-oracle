@@ -12,6 +12,7 @@ declare global {
     chunkOrder: number;
     text: string;
     numTokens?: number;
+    score: number;
   }
 
   export type ContentDbEntry = PageChunk & {

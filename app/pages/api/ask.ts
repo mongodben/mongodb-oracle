@@ -93,13 +93,13 @@ async function createContext(question: string) {
   return { context, pageChunks };
 }
 
-async function getPageResults(question: string) {
+async function getPageResults(question: string): Promise<PageChunk[]> {
   const embedding = await createEmbedding(question);
   const pageChunks = await searchPages(embedding);
-  const uniqueLinks = Array.from(
-    new Set<string>(pageChunks.map((chunk) => chunk.url))
+  const uniqueChunks = Object.fromEntries(
+    pageChunks.map((chunk) => [chunk.url, chunk])
   );
-  return uniqueLinks;
+  return Object.values(uniqueChunks);
 }
 
 const USE_STREAMING =
@@ -114,7 +114,8 @@ export default async function handler(
     return;
   }
   const shouldUseLlm = req.query.withLlm === "true";
-  const shouldStream = shouldUseLlm && USE_STREAMING && req.query.stream === "true";
+  const shouldStream =
+    shouldUseLlm && USE_STREAMING && req.query.stream === "true";
   const { conversation_id, question } = RequestBody.parse(req.body);
 
   try {
@@ -136,26 +137,23 @@ export default async function handler(
     if (!shouldUseLlm) {
       console.log("skipping llm generation. just getting page results");
       const pageResults = await getPageResults(question);
-      if (pageResults.length === 0) {
-        res.status(400).json(
-          error({
-            errors: ["Question does not match any pages in the search index."],
-          })
-        );
-        return;
-      } else {
-        const answer =
-          "Pages that match your question:\n\n" +
-          pageResults.map((link) => `- [${link}](${link})`).join("\n");
-        res.status(200).json(
-          success({
-            conversation_id: conversation._id,
-            message_id: new BSON.ObjectId().toHexString(),
-            answer,
-          })
-        );
-        return;
-      }
+      const answer =
+        pageResults.length === 0
+          ? "I could not find a good match for that question."
+          : "Pages that match your question:\n\n" +
+            pageResults
+              .map(
+                ({ url, score }) => `- [${url}](${url}) (${score.toFixed(4)})`
+              )
+              .join("\n");
+      res.status(200).json(
+        success({
+          conversation_id: conversation._id,
+          message_id: new BSON.ObjectId().toHexString(),
+          answer,
+        })
+      );
+      return;
     }
     console.log("continuing on w llm generation");
     const { context } = await createContext(question);

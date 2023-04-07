@@ -21,6 +21,7 @@ type PageChunk = {
   embedding: number[];
   dateUpdated: Date;
   siteId: string;
+  score: number;
 };
 
 async function getPageCollection() {
@@ -40,7 +41,23 @@ async function getPageCollection() {
   return client.db(DB_NAME).collection<PageChunk>(COLLECTION_NAME);
 }
 
-export async function searchPages(embedding: number[]) {
+export type SearchPagesOptions = {
+  k: number;
+  minScore: number;
+  filter?: Record<string, unknown>;
+};
+
+const defaultSearchPagesOptions: SearchPagesOptions = {
+  k: 3,
+  minScore: 0.75,
+};
+
+export async function searchPages(
+  embedding: number[],
+  optionsIn?: Partial<SearchPagesOptions>
+): Promise<PageChunk[]> {
+  const options = { ...defaultSearchPagesOptions, ...optionsIn };
+  const { k, minScore, filter } = options;
   const pages = await getPageCollection();
   const cursor = pages.aggregate<PageChunk>([
     {
@@ -49,12 +66,19 @@ export async function searchPages(embedding: number[]) {
         knnBeta: {
           vector: embedding,
           path: "embedding",
-          // "filter": {<filter-specification>},
-          k: 3,
-          // "score": {<options>} NOTE: not sure what this is
+          filter,
+          k,
         },
       },
     },
+    {
+      $addFields: {
+        score: {
+          $meta: "searchScore",
+        },
+      },
+    },
+    { $match: { score: { $gte: minScore } } },
   ]);
   const results = await cursor.toArray();
   return results;
