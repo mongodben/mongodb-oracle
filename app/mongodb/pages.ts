@@ -48,8 +48,8 @@ export type SearchPagesOptions = {
 };
 
 const defaultSearchPagesOptions: SearchPagesOptions = {
-  k: 3,
-  minScore: 0.75,
+  k: 5,
+  minScore: 0.7,
 };
 
 export async function searchPages(

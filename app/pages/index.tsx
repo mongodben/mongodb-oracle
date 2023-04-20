@@ -165,7 +165,7 @@ export default function Home() {
           {messages.length > 0 && (
             <ul className="flex-grow space-y-2 flex flex-col overflow-hidden">
               {messages.map(({ id, type, children, level }) => (
-                <Message key={id} type={type} level={level}>
+                <Message key={id} type={type} level={level} withLlm={withLlm} >
                   {children}
                 </Message>
               ))}

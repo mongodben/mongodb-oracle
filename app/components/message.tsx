@@ -11,9 +11,16 @@ export interface ClientMessage {
   type: "user" | "oracle" | "system";
   children: string;
   level?: "info" | "warn" | "error";
+  withLlm: boolean;
 }
 
-function OracleMessage({ children }: { children: ClientMessage["children"] }) {
+function OracleMessage({
+  withLlm,
+  children,
+}: {
+  withLlm: boolean;
+  children: ClientMessage["children"];
+}) {
   const [userResponse, setUserResponse] = useState<"good" | "bad" | null>(null);
   const status = useMongoDBOracle((state) => state.status);
 
@@ -68,11 +75,13 @@ function OracleMessage({ children }: { children: ClientMessage["children"] }) {
           )}
         </div>
       )}
-      <div className="bg-lg-gray-dark1 px-2 py-1">
-        <Disclaimer className="text-lg-gray-light3">
-          Warning: Not all answers are correct!
-        </Disclaimer>
-      </div>
+      {withLlm && (
+        <div className="bg-lg-gray-dark1 px-2 py-1">
+          <Disclaimer className="text-lg-gray-light3">
+            Warning: Not all answers are correct!
+          </Disclaimer>
+        </div>
+      )}
     </motion.li>
   );
 }
@@ -115,11 +124,12 @@ function SystemMessage({
 export default function Message({
   type,
   children,
+  withLlm,
   level = "info",
 }: ClientMessage) {
   switch (type) {
     case "oracle":
-      return <OracleMessage>{children}</OracleMessage>;
+      return <OracleMessage withLlm={withLlm}>{children}</OracleMessage>;
     case "user":
       return <UserMessage>{children}</UserMessage>;
     case "system":
