@@ -143,7 +143,7 @@ export default async function handler(
           : "Pages that match your question:\n\n" +
             pageResults
               .map(
-                ({ url, score }) => `- [${url}](${url}) (${score.toFixed(4)})`
+                ({ url, score }) => `- [${url}](${url}) (${score!.toFixed(4)})`
               )
               .join("\n");
       res.status(200).json(
